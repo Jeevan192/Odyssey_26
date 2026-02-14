@@ -6,8 +6,8 @@ import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { auth } from "../../firebase";
+// import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+// import { auth } from "../../firebase";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -23,50 +23,14 @@ function Login() {
     }
   };
   
-  const handleLogin = async () => {
-    setError(null);
-    setIsLoading(true);
+const handleLogin = () => {
+  window.location.href = "/game";
+};
 
-    try {
-      await signIn("credentials", {
-        email,
-        password,
-        redirect: true,
-        callbackUrl: "/",
-      });
-    } catch (err) {
-      setError("Login failed. Please check your credentials.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  
 
-  const handleGoogleLogin = async () => {
-    setError(null);
-    setIsGoogleLoading(true);
-    
-    try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      
-      const user = result.user;
-      
-      await signIn("credentials", {
-        uid: user.uid,
-        email: user.email,
-        name: user.displayName,
-        image: user.photoURL,
-        isFirebaseGoogleUser: true,
-        redirect: true,
-        callbackUrl: "/",
-      });
-      
-    } catch (err) {
-      console.error("Google login error:", err);
-      setError("Google login failed. Please try again.");
-      setIsGoogleLoading(false);
-    }
-  };
+    const handleGoogleLogin = async () => { }
+
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-[calc(100vh-4rem)] px-4">
