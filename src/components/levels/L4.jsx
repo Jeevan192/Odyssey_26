@@ -1,15 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "../ui/use-toast";
 
-const GRID_SIZE = 6;
-const LETTERS = ["A", "B", "C", "D", "E", "F"];
+// 5x5 board
+const BOARD_SIZE = 5;
+const LETTERS = ["A", "B", "C", "D", "E"];
 
-// Valid L-shaped knight moves
+// Knight L-shaped moves
 const KNIGHT_DELTAS = [
   { dx: 2, dy: 1 },
   { dx: 2, dy: -1 },
@@ -21,164 +22,201 @@ const KNIGHT_DELTAS = [
   { dx: -1, dy: -2 },
 ];
 
-const isInBounds = (x, y) => x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE;
+const inBounds = (x, y) => x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE;
 
-const isValidKnightMove = (from, to) => {
-  return KNIGHT_DELTAS.some(
-    (d) => from.x + d.dx === to.x && from.y + d.dy === to.y
-  );
-};
+const isValidKnightMove = (from, to) =>
+  KNIGHT_DELTAS.some((d) => from.x + d.dx === to.x && from.y + d.dy === to.y);
 
-// Parse chess notation like "A1" -> { x: 0, y: 5 } (A=col0, 1=bottom row)
+// Parse chess notation e.g. "A1" -> { x:0, y:4 }
 const parseNotation = (str) => {
-  const cleaned = str.trim().toUpperCase();
-  if (cleaned.length < 2) return null;
-  const col = LETTERS.indexOf(cleaned[0]);
-  const row = parseInt(cleaned.slice(1));
-  if (col < 0 || isNaN(row) || row < 1 || row > GRID_SIZE) return null;
-  return { x: col, y: GRID_SIZE - row };
+  const s = str.trim().toUpperCase();
+  if (s.length < 2) return null;
+  const col = LETTERS.indexOf(s[0]);
+  const row = parseInt(s.slice(1));
+  if (col < 0 || isNaN(row) || row < 1 || row > BOARD_SIZE) return null;
+  return { x: col, y: BOARD_SIZE - row };
 };
 
-// Convert { x, y } to notation like "A6"
-const toNotation = (x, y) => `${LETTERS[x]}${GRID_SIZE - y}`;
+const toNotation = (x, y) => `${LETTERS[x]}${BOARD_SIZE - y}`;
+
+// Generate a random starting position
+const randomStart = () => ({
+  x: Math.floor(Math.random() * BOARD_SIZE),
+  y: Math.floor(Math.random() * BOARD_SIZE),
+});
 
 const Level4 = ({ onComplete }) => {
   const [inputValue, setInputValue] = useState("");
   const [isHelpModalOpen, setHelpModalOpen] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [knightPos, setKnightPos] = useState({ x: 0, y: 0 }); // A6 top-left
-  const [visitedOrder, setVisitedOrder] = useState({ "0,0": 1 }); // maps "x,y" -> step number
-  const [moveCount, setMoveCount] = useState(0);
+
+  const initialized = useRef(false);
+  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+  const [knightPos, setKnightPos] = useState({ x: 0, y: 0 });
+  const [visited, setVisited] = useState(new Set(["0,0"]));
   const [moveHistory, setMoveHistory] = useState([{ x: 0, y: 0 }]);
+  const [moveCount, setMoveCount] = useState(0);
   const [isStuck, setIsStuck] = useState(false);
-  const [message, setMessage] = useState("Visit every square on the board using the knight.");
+  const [message, setMessage] = useState("");
   const { toast } = useToast();
 
-  const totalSquares = GRID_SIZE * GRID_SIZE;
-  const visitedCount = Object.keys(visitedOrder).length;
+  const totalSquares = BOARD_SIZE * BOARD_SIZE;
+
+  // Initialize with random start on first mount
+  useEffect(() => {
+    if (!initialized.current) {
+      initialized.current = true;
+      const s = randomStart();
+      setStartPos(s);
+      setKnightPos({ ...s });
+      setVisited(new Set([`${s.x},${s.y}`]));
+      setMoveHistory([{ ...s }]);
+      setMessage(
+        `The knight begins at the green castle (${toNotation(s.x, s.y)}). Visit every square!`
+      );
+    }
+  }, []);
+
+  const visitedCount = visited.size;
+
+  // Check win: all 25 squares visited (open tour — closed tour is impossible on 5×5)
+  useEffect(() => {
+    if (visitedCount === totalSquares && !isSuccess) {
+      setIsSuccess(true);
+      setMessage(
+        String.fromCodePoint(0x1f389) +
+          " All squares visited! The knight conquered the board!"
+      );
+    }
+  }, [visitedCount, totalSquares, isSuccess]);
 
   useEffect(() => {
     if (isSuccess) {
       toast({
-        title: "Knight's Tour Complete! ♞",
-        description: `You visited all ${totalSquares} squares in ${moveCount} moves!`,
+        title: "Knight's Tour Complete! " + String.fromCodePoint(0x265e),
+        description: `Open tour finished in ${moveCount} moves!`,
         variant: "success",
       });
-      setTimeout(() => {
-        onComplete(4);
-      }, 2000);
+      setTimeout(() => onComplete(4), 2000);
     }
-  }, [isSuccess, onComplete, toast, totalSquares, moveCount]);
+  }, [isSuccess, onComplete, toast, moveCount]);
 
-  // Check win condition
+  // Check stuck (no valid unvisited moves remaining)
   useEffect(() => {
-    if (visitedCount === totalSquares && !isSuccess) {
-      setIsSuccess(true);
-      setMessage("🎉 All squares visited! The lonely knight is no longer alone!");
-    }
-  }, [visitedCount, totalSquares, isSuccess]);
-
-  // Check if stuck (no valid unvisited moves)
-  useEffect(() => {
-    if (visitedCount < totalSquares && !isSuccess) {
-      const hasValidMove = KNIGHT_DELTAS.some((d) => {
+    if (visitedCount < totalSquares && !isSuccess && moveCount > 0) {
+      const hasMove = KNIGHT_DELTAS.some((d) => {
         const nx = knightPos.x + d.dx;
         const ny = knightPos.y + d.dy;
-        return isInBounds(nx, ny) && !visitedOrder[`${nx},${ny}`];
+        return inBounds(nx, ny) && !visited.has(`${nx},${ny}`);
       });
-      if (!hasValidMove && visitedCount > 0) {
+      if (!hasMove) {
         setIsStuck(true);
-        setMessage("😔 No more valid moves! Use /undo or /reset to try again.");
+        setMessage(
+          `No valid moves left! ${visitedCount}/${totalSquares} visited. Use /undo or /reset.`
+        );
       } else {
         setIsStuck(false);
       }
     }
-  }, [knightPos, visitedOrder, visitedCount, totalSquares, isSuccess]);
+  }, [knightPos, visited, visitedCount, totalSquares, isSuccess, moveCount]);
 
-  const validMoves = KNIGHT_DELTAS.map((d) => ({
-    x: knightPos.x + d.dx,
-    y: knightPos.y + d.dy,
-  })).filter((m) => isInBounds(m.x, m.y) && !visitedOrder[`${m.x},${m.y}`]);
+  // Valid moves for current position (unvisited only)
+  const getValidMoves = useCallback(() => {
+    return KNIGHT_DELTAS.map((d) => ({
+      x: knightPos.x + d.dx,
+      y: knightPos.y + d.dy,
+    })).filter((m) => inBounds(m.x, m.y) && !visited.has(`${m.x},${m.y}`));
+  }, [knightPos, visited]);
 
-  const handleInputChange = (e) => setInputValue(e.target.value);
-  const handleEnter = (e) => {
-    if (e.key === "Enter") handleCommandSubmit();
-  };
+  const validMoves = getValidMoves();
 
   const handleCommandSubmit = () => {
     const cmd = inputValue.trim().toLowerCase();
-
-    const moveMatch = cmd.match(/^\/move\s+([a-f]\d)$/i);
+    const moveMatch = cmd.match(/^\/move\s+([a-e]\d)$/i);
+    const undoMatch = cmd.match(/^\/undo$/i);
     const resetMatch = cmd.match(/^\/reset$/i);
     const helpMatch = cmd.match(/^\/help$/i);
-    const undoMatch = cmd.match(/^\/undo$/i);
 
     if (moveMatch) {
       const target = parseNotation(moveMatch[1]);
       if (!target) {
         toast({
           title: "Invalid Square",
-          description: `Use format like /move A1 or /move C4 (columns A-${LETTERS[GRID_SIZE - 1]}, rows 1-${GRID_SIZE}).`,
+          description: `Use A1\u2013E5.`,
+          variant: "destructive",
+        });
+      } else if (!inBounds(target.x, target.y)) {
+        toast({
+          title: "Out of Bounds",
+          description: `${moveMatch[1].toUpperCase()} is outside the 5\u00d75 board.`,
           variant: "destructive",
         });
       } else if (!isValidKnightMove(knightPos, target)) {
         toast({
-          title: "Invalid Move ❌",
-          description: `A knight can't reach ${toNotation(target.x, target.y)} from ${toNotation(knightPos.x, knightPos.y)}. Knights move in an L-shape.`,
+          title: "Invalid Move",
+          description: `The knight can\u2019t reach ${toNotation(target.x, target.y)} from ${toNotation(knightPos.x, knightPos.y)}. Move in an L-shape!`,
           variant: "destructive",
         });
-      } else if (visitedOrder[`${target.x},${target.y}`]) {
+      } else if (visited.has(`${target.x},${target.y}`)) {
         toast({
-          title: "Already Visited",
-          description: `${toNotation(target.x, target.y)} was visited on step ${visitedOrder[`${target.x},${target.y}`]}. Each square can only be visited once!`,
+          title: "Square Already Visited",
+          description: `${toNotation(target.x, target.y)} has already vanished!`,
           variant: "destructive",
         });
       } else {
+        const newVisited = new Set(visited);
+        newVisited.add(`${target.x},${target.y}`);
         const newCount = moveCount + 1;
-        const newVisited = { ...visitedOrder, [`${target.x},${target.y}`]: newCount + 1 };
         setKnightPos(target);
+        setVisited(newVisited);
         setMoveCount(newCount);
-        setVisitedOrder(newVisited);
         setMoveHistory((prev) => [...prev, target]);
         setIsStuck(false);
-        const remaining = totalSquares - Object.keys(newVisited).length;
-        setMessage(
-          remaining === 0
-            ? "🎉 All squares visited!"
-            : `Moved to ${toNotation(target.x, target.y)}. ${remaining} square${remaining !== 1 ? "s" : ""} remaining.`
-        );
+        const remaining = totalSquares - newVisited.size;
+        if (remaining > 0) {
+          setMessage(
+            `Moved to ${toNotation(target.x, target.y)}. ${remaining} square${remaining !== 1 ? "s" : ""} remaining.`
+          );
+        }
       }
     } else if (undoMatch) {
       if (moveHistory.length > 1) {
         const newHistory = moveHistory.slice(0, -1);
         const prevPos = newHistory[newHistory.length - 1];
         const lastPos = moveHistory[moveHistory.length - 1];
-        const newVisited = { ...visitedOrder };
-        delete newVisited[`${lastPos.x},${lastPos.y}`];
+        const newVisited = new Set(visited);
+        // Don't un-visit the start position
+        if (!(lastPos.x === startPos.x && lastPos.y === startPos.y)) {
+          newVisited.delete(`${lastPos.x},${lastPos.y}`);
+        }
         setMoveHistory(newHistory);
         setKnightPos(prevPos);
         setMoveCount(moveCount - 1);
-        setVisitedOrder(newVisited);
+        setVisited(newVisited);
         setIsStuck(false);
         setMessage(`Undone. Back to ${toNotation(prevPos.x, prevPos.y)}.`);
       } else {
         toast({
           title: "Nothing to Undo",
-          description: "You're at the starting position.",
+          description: "You\u2019re at the starting position.",
           variant: "default",
         });
       }
     } else if (resetMatch) {
-      setKnightPos({ x: 0, y: 0 });
-      setMoveHistory([{ x: 0, y: 0 }]);
-      setVisitedOrder({ "0,0": 1 });
+      const s = randomStart();
+      setStartPos(s);
+      setKnightPos({ ...s });
+      setMoveHistory([{ ...s }]);
+      setVisited(new Set([`${s.x},${s.y}`]));
       setMoveCount(0);
       setIsSuccess(false);
       setIsStuck(false);
-      setMessage("Visit every square on the board using the knight.");
+      setMessage(
+        `New start at ${toNotation(s.x, s.y)}. Visit every square!`
+      );
       toast({
         title: "Level Reset",
-        description: "Knight returned to A6. Try again!",
+        description: `Knight placed at ${toNotation(s.x, s.y)}. Try again!`,
         variant: "default",
       });
     } else if (helpMatch) {
@@ -186,20 +224,21 @@ const Level4 = ({ onComplete }) => {
     } else {
       toast({
         title: "Unknown Command",
-        description: "Type /help to see available commands",
+        description: "Type /help to see available commands.",
         variant: "destructive",
       });
     }
-
     setInputValue("");
   };
 
-  const closeHelpModal = () => setHelpModalOpen(false);
+  const handleEnter = (e) => {
+    if (e.key === "Enter") handleCommandSubmit();
+  };
 
-  const CELL_SIZE = 60;
-  const LABEL_SIZE = 24;
-  const SVG_W = GRID_SIZE * CELL_SIZE + LABEL_SIZE;
-  const SVG_H = GRID_SIZE * CELL_SIZE + LABEL_SIZE;
+  const CELL = 64;
+  const LABEL = 22;
+  const SVG_W = BOARD_SIZE * CELL + LABEL;
+  const SVG_H = BOARD_SIZE * CELL + LABEL;
 
   return (
     <div className="flex flex-col items-center mt-8 max-w-4xl mx-auto px-4">
@@ -208,7 +247,7 @@ const Level4 = ({ onComplete }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className={`mt-8 text-base sm:text-lg font-semibold mb-4 text-center ${
+        className={`mt-8 text-sm sm:text-base font-semibold mb-4 text-center ${
           isStuck
             ? "text-red-500 dark:text-red-400"
             : isSuccess
@@ -224,14 +263,14 @@ const Level4 = ({ onComplete }) => {
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, delay: 0.3 }}
-        className="bg-[#1a1a2e] dark:bg-[#1a1a2e] rounded-2xl p-3 shadow-lg border border-purple-700/30 w-full max-w-sm relative"
+        className="bg-[#1a1a2e] rounded-2xl p-3 shadow-lg border border-purple-700/30 w-full max-w-[380px] relative"
       >
         <svg viewBox={`0 0 ${SVG_W} ${SVG_H}`} className="w-full">
-          {/* Column labels (A-F) */}
+          {/* Column labels */}
           {LETTERS.map((letter, i) => (
             <text
               key={`col-${i}`}
-              x={LABEL_SIZE + i * CELL_SIZE + CELL_SIZE / 2}
+              x={LABEL + i * CELL + CELL / 2}
               y={SVG_H - 4}
               textAnchor="middle"
               fontSize="12"
@@ -242,91 +281,155 @@ const Level4 = ({ onComplete }) => {
             </text>
           ))}
 
-          {/* Row labels (6-1 top to bottom) */}
-          {Array.from({ length: GRID_SIZE }, (_, i) => (
+          {/* Row labels */}
+          {Array.from({ length: BOARD_SIZE }, (_, i) => (
             <text
               key={`row-${i}`}
-              x={10}
-              y={i * CELL_SIZE + CELL_SIZE / 2 + 5}
+              x={9}
+              y={i * CELL + CELL / 2 + 5}
               textAnchor="middle"
               fontSize="12"
               fill="#8888BB"
               fontWeight="bold"
             >
-              {GRID_SIZE - i}
+              {BOARD_SIZE - i}
             </text>
           ))}
 
           {/* Grid cells */}
-          {Array.from({ length: GRID_SIZE }, (_, row) =>
-            Array.from({ length: GRID_SIZE }, (_, col) => {
-              const x = col;
-              const y = row;
-              const key = `${x},${y}`;
-              const step = visitedOrder[key];
-              const isKnight = x === knightPos.x && y === knightPos.y;
-              const isValid = validMoves.some((m) => m.x === x && m.y === y);
+          {Array.from({ length: BOARD_SIZE }, (_, row) =>
+            Array.from({ length: BOARD_SIZE }, (_, col) => {
+              const key = `${col},${row}`;
+              const isKnight = col === knightPos.x && row === knightPos.y;
+              const isStart = col === startPos.x && row === startPos.y;
+              const isVisited = visited.has(key) && !isKnight && !isStart;
+              const isValid = validMoves.some(
+                (m) => m.x === col && m.y === row
+              );
               const isDark = (row + col) % 2 === 1;
-              const isVisited = !!step && !isKnight;
 
+              const cellX = LABEL + col * CELL;
+              const cellY = row * CELL;
+              const cx = cellX + CELL / 2;
+              const cy = cellY + CELL / 2;
+
+              // Determine fill
               let fillColor;
               if (isKnight) {
                 fillColor = "#7C3AED";
+              } else if (isStart && !isKnight) {
+                fillColor = "#2E7D32";
               } else if (isVisited) {
-                fillColor = isDark ? "#1a3a20" : "#1e4a28";
+                fillColor = "#0a0a15";
               } else if (isValid) {
                 fillColor = isDark ? "#3a2060" : "#4a2878";
               } else {
                 fillColor = isDark ? "#2D1B4B" : "#3D2060";
               }
 
-              const cellX = LABEL_SIZE + col * CELL_SIZE;
-              const cellY = row * CELL_SIZE;
-              const centerX = cellX + CELL_SIZE / 2;
-              const centerY = cellY + CELL_SIZE / 2;
-
               return (
                 <g key={key}>
                   <motion.rect
                     x={cellX}
                     y={cellY}
-                    width={CELL_SIZE}
-                    height={CELL_SIZE}
+                    width={CELL}
+                    height={CELL}
                     fill={fillColor}
-                    stroke="#6B21A8"
-                    strokeWidth="1"
+                    stroke={isVisited ? "#0a0a15" : "#6B21A8"}
+                    strokeWidth={isVisited ? "0.5" : "0.8"}
                     rx="2"
-                    animate={{ fill: fillColor }}
+                    animate={{
+                      fill: fillColor,
+                      opacity: isVisited ? 0.3 : 1,
+                    }}
                     transition={{ duration: 0.3 }}
                   />
 
-                  {/* Valid move dot */}
+                  {/* Green castle marker (start) — only when knight is NOT on it */}
+                  {isStart && !isKnight && (
+                    <g>
+                      <rect
+                        x={cx - 12}
+                        y={cy - 12}
+                        width={5}
+                        height={7}
+                        fill="#66BB6A"
+                        rx="1"
+                      />
+                      <rect
+                        x={cx - 2}
+                        y={cy - 14}
+                        width={5}
+                        height={9}
+                        fill="#66BB6A"
+                        rx="1"
+                      />
+                      <rect
+                        x={cx + 7}
+                        y={cy - 12}
+                        width={5}
+                        height={7}
+                        fill="#66BB6A"
+                        rx="1"
+                      />
+                      <rect
+                        x={cx - 12}
+                        y={cy - 5}
+                        width={24}
+                        height={16}
+                        fill="#4CAF50"
+                        rx="2"
+                      />
+                      <rect
+                        x={cx - 3}
+                        y={cy + 2}
+                        width={7}
+                        height={9}
+                        fill="#2E7D32"
+                        rx="1"
+                      />
+                      <text
+                        x={cx}
+                        y={cy + 22}
+                        textAnchor="middle"
+                        fontSize="7"
+                        fill="#81C784"
+                        fontWeight="bold"
+                      >
+                        START
+                      </text>
+                    </g>
+                  )}
+
+                  {/* Valid move indicator (pulsing yellow dot) */}
                   {isValid && !isKnight && (
                     <motion.circle
-                      cx={centerX}
-                      cy={centerY}
+                      cx={cx}
+                      cy={cy}
                       r="8"
                       fill="#F9DC34"
                       initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: [0.3, 0.6, 0.3], scale: 1 }}
+                      animate={{
+                        opacity: [0.3, 0.7, 0.3],
+                        scale: 1,
+                      }}
                       transition={{ duration: 1.5, repeat: Infinity }}
                     />
                   )}
 
-                  {/* Visited step number */}
+                  {/* Vanished square mark */}
                   {isVisited && (
                     <motion.text
-                      x={centerX}
-                      y={centerY + 5}
+                      x={cx}
+                      y={cy + 4}
                       textAnchor="middle"
                       fontSize="14"
-                      fill="#4ade80"
+                      fill="#333"
                       fontWeight="bold"
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 0.7, scale: 1 }}
-                      transition={{ type: "spring", stiffness: 300 }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 0.3 }}
                     >
-                      {step}
+                      {String.fromCodePoint(0x2716)}
                     </motion.text>
                   )}
                 </g>
@@ -334,43 +437,20 @@ const Level4 = ({ onComplete }) => {
             })
           )}
 
-          {/* Move trail lines */}
-          {moveHistory.length > 1 &&
-            moveHistory.slice(0, -1).map((pos, i) => {
-              const next = moveHistory[i + 1];
-              const x1 = LABEL_SIZE + pos.x * CELL_SIZE + CELL_SIZE / 2;
-              const y1 = pos.y * CELL_SIZE + CELL_SIZE / 2;
-              const x2 = LABEL_SIZE + next.x * CELL_SIZE + CELL_SIZE / 2;
-              const y2 = next.y * CELL_SIZE + CELL_SIZE / 2;
-              return (
-                <line
-                  key={`trail-${i}`}
-                  x1={x1}
-                  y1={y1}
-                  x2={x2}
-                  y2={y2}
-                  stroke="#F9DC34"
-                  strokeWidth="1.5"
-                  strokeDasharray="4 3"
-                  opacity="0.3"
-                />
-              );
-            })}
-
           {/* Knight piece */}
           <AnimatePresence mode="popLayout">
             <motion.text
               key={`knight-${knightPos.x}-${knightPos.y}`}
-              x={LABEL_SIZE + knightPos.x * CELL_SIZE + CELL_SIZE / 2}
-              y={knightPos.y * CELL_SIZE + CELL_SIZE / 2 + 12}
+              x={LABEL + knightPos.x * CELL + CELL / 2}
+              y={knightPos.y * CELL + CELL / 2 + 12}
               textAnchor="middle"
-              fontSize="34"
+              fontSize="36"
               className="select-none"
               initial={{ scale: 0.3, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
-              ♞
+              {String.fromCodePoint(0x265e)}
             </motion.text>
           </AnimatePresence>
         </svg>
@@ -379,19 +459,28 @@ const Level4 = ({ onComplete }) => {
         <div className="mt-2 px-2">
           <div className="flex justify-between text-xs text-purple-300 mb-1">
             <span>
-              Visited: <span className="text-[#F9DC34] font-bold">{visitedCount}/{totalSquares}</span>
+              Squares:{" "}
+              <span className="text-[#F9DC34] font-bold">
+                {visitedCount}/{totalSquares}
+              </span>
             </span>
             <span>
-              Moves: <span className="text-[#F9DC34] font-bold">{moveCount}</span>
+              Moves:{" "}
+              <span className="text-[#F9DC34] font-bold">{moveCount}</span>
             </span>
             <span>
-              At: <span className="text-[#F9DC34] font-bold">{toNotation(knightPos.x, knightPos.y)}</span>
+              At:{" "}
+              <span className="text-[#F9DC34] font-bold">
+                {toNotation(knightPos.x, knightPos.y)}
+              </span>
             </span>
           </div>
           <div className="w-full bg-purple-900/40 rounded-full h-2">
             <motion.div
-              className="h-2 rounded-full bg-gradient-to-r from-[#F9DC34] to-[#F5A623]"
-              animate={{ width: `${(visitedCount / totalSquares) * 100}%` }}
+              className="h-2 rounded-full bg-gradient-to-r from-[#4CAF50] to-[#7C3AED]"
+              animate={{
+                width: `${(visitedCount / totalSquares) * 100}%`,
+              }}
               transition={{ type: "spring", stiffness: 100 }}
             />
           </div>
@@ -415,7 +504,6 @@ const Level4 = ({ onComplete }) => {
             to get commands and hints
           </motion.span>
 
-          {/* Command input */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -425,7 +513,7 @@ const Level4 = ({ onComplete }) => {
             <Input
               type="text"
               value={inputValue}
-              onChange={handleInputChange}
+              onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleEnter}
               placeholder="Enter command..."
               className="border-purple-300 dark:border-purple-600/50 bg-white dark:bg-[#1A0F2E]/70 shadow-inner focus:ring-[#F5A623] focus:border-[#F9DC34]"
@@ -456,21 +544,23 @@ const Level4 = ({ onComplete }) => {
           >
             <div className="p-6 overflow-y-auto flex-grow">
               <h2 className="text-2xl font-bold mb-4 text-purple-800 dark:text-[#F9DC34]">
-                The Lonely Knight ♞
+                The Lonely Knight {String.fromCodePoint(0x265e)}
               </h2>
               <div className="space-y-1 mb-6">
                 <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg border-l-4 border-[#F5A623]">
                   <span className="font-bold text-purple-700 dark:text-purple-300">
                     /move
                   </span>{" "}
-                  <span className="text-blue-600 dark:text-blue-300">[square]</span>
+                  <span className="text-blue-600 dark:text-blue-300">
+                    [square]
+                  </span>
                   <p className="mt-1 text-gray-600 dark:text-gray-300">
-                    Move the knight to a square (e.g., <code>/move B4</code>).
+                    Move the knight to a square (e.g.,{" "}
+                    <code>/move B3</code>).
                     <br />
-                    Columns: A–{LETTERS[GRID_SIZE - 1]}, Rows: 1–{GRID_SIZE}
+                    Columns: A{"\u2013"}E, Rows: 1{"\u2013"}5
                   </p>
                 </div>
-
                 <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg border-l-4 border-[#F5A623]">
                   <span className="font-bold text-purple-700 dark:text-purple-300">
                     /undo
@@ -479,16 +569,14 @@ const Level4 = ({ onComplete }) => {
                     Take back your last move.
                   </p>
                 </div>
-
                 <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg border-l-4 border-[#F5A623]">
                   <span className="font-bold text-purple-700 dark:text-purple-300">
                     /reset
                   </span>
                   <p className="mt-1 text-gray-600 dark:text-gray-300">
-                    Start over from square A{GRID_SIZE}.
+                    Start over with a new random position.
                   </p>
                 </div>
-
                 <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg border-l-4 border-[#F5A623]">
                   <span className="font-bold text-purple-700 dark:text-purple-300">
                     /help
@@ -503,23 +591,41 @@ const Level4 = ({ onComplete }) => {
                 Rules:
               </h3>
               <div className="space-y-1 text-gray-600 dark:text-gray-300 text-sm mb-4">
-                <p>• The knight moves in an <strong>L-shape</strong>: 2 squares in one direction + 1 square perpendicular.</p>
-                <p>• Visit every square on the {GRID_SIZE}×{GRID_SIZE} board <strong>exactly once</strong>.</p>
-                <p>• <span className="text-[#F9DC34]">●</span> Yellow dots show valid moves.</p>
-                <p>• <span className="text-green-400">Green numbers</span> show your path order.</p>
+                <p>
+                  &#8226; The knight starts at a random{" "}
+                  <strong className="text-green-500">green castle</strong>.
+                </p>
+                <p>
+                  &#8226; Move in an <strong>L-shape</strong>: 2 squares + 1
+                  square perpendicular.
+                </p>
+                <p>
+                  &#8226; Squares <strong>vanish</strong> after the knight
+                  leaves &mdash; no going back!
+                </p>
+                <p>
+                  &#8226; Visit <strong>all 25 squares</strong> on the 5&times;5
+                  board to win.
+                </p>
+                <p>
+                  &#8226;{" "}
+                  <span className="text-[#F9DC34]">&#9679;</span> Yellow
+                  dots show valid moves.
+                </p>
               </div>
 
               <h3 className="text-xl font-bold mb-2 text-purple-800 dark:text-[#F9DC34]">
                 Hint:
               </h3>
               <p className="text-gray-600 dark:text-gray-300 italic">
-                Try to stay near the edges first and work inward. Avoid getting trapped in corners!
+                Use Warnsdorf&apos;s rule: always move to the square with the
+                fewest onward moves. Try to stay near the edges first!
               </p>
             </div>
 
             <div className="bg-purple-50 dark:bg-purple-900/30 px-6 py-4 text-center flex-shrink-0">
               <button
-                onClick={closeHelpModal}
+                onClick={() => setHelpModalOpen(false)}
                 className="bg-gradient-to-r from-[#F9DC34] to-[#F5A623] hover:from-[#FFE55C] hover:to-[#FFBD4A] px-6 py-2 rounded-lg text-purple-900 font-medium shadow-md transition-transform hover:scale-105"
               >
                 Close

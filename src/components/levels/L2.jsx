@@ -140,7 +140,6 @@ const Level2 = ({ onComplete }) => {
     } else if (resetMatch) {
       setHasObserved(false);
       setIsDarkScene(false);
-      setTheme("light");
       sunControls.start({ y: 0, opacity: 1, transition: { duration: 0 } });
       sunflowerControls.start({ rotate: 0, transition: { duration: 0 } });
       petalControls.start({ scale: 1, transition: { duration: 0 } });

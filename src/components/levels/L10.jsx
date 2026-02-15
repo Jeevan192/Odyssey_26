@@ -73,7 +73,7 @@ const Level10 = ({ onComplete }) => {
   // Position names for the 2×2 grid
   const POS_MAP = {
     "top-left": 0, "tl": 0, "1": 0,
-    "top-right": 0, "tr": 1, "2": 1,
+    "top-right": 1, "tr": 1, "2": 1,
     "bottom-left": 2, "bl": 2, "3": 2,
     "bottom-right": 3, "br": 3, "4": 3};
 

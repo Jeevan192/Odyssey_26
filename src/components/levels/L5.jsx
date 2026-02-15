@@ -156,7 +156,7 @@ const Level5 = ({ onComplete }) => {
     const cmd = inputValue.trim().toLowerCase();
 
     const crossWithMatch = cmd.match(
-      /^\/cross\s+with\s+(wolf|goat|cabbage)$/i
+      /^\/cross\s+with\s+(wolf|goat|sheep|cabbage)$/i
     );
     const crossAloneMatch = cmd.match(/^\/cross\s+alone$/i);
     const resetMatch = cmd.match(/^\/reset$/i);
@@ -173,7 +173,9 @@ const Level5 = ({ onComplete }) => {
     }
 
     if (crossWithMatch) {
-      const item = crossWithMatch[1].toLowerCase();
+      let item = crossWithMatch[1].toLowerCase();
+      // Accept "sheep" as alias for "goat" (internal key)
+      if (item === "sheep") item = "goat";
       const currentBank = playerSide === "left" ? leftBank : rightBank;
 
       if (!currentBank.includes(item)) {

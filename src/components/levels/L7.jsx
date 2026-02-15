@@ -20,6 +20,15 @@ const Level7 = ({ onComplete }) => {
   const [moveCount, setMoveCount] = useState(0);
   const { toast } = useToast();
 
+  // Auto-detect win: either jug reaches exactly TARGET liters
+  useEffect(() => {
+    if ((jug5 === TARGET || jug3 === TARGET) && !isSuccess) {
+      const whichJug = jug5 === TARGET ? "5L" : "3L";
+      setScaleValue(TARGET);
+      setIsSuccess(true);
+    }
+  }, [jug5, jug3, isSuccess]);
+
   useEffect(() => {
     if (isSuccess) {
       toast({

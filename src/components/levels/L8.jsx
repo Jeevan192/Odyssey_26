@@ -192,7 +192,7 @@ const Level8 = ({ onComplete }) => {
       }
     } else if (resetMatch) {
       initialized.current = true;
-      setFakeCoin(9);
+      setFakeCoin(Math.floor(Math.random() * TOTAL_COINS) + 1);
       setWeighingsLeft(MAX_WEIGHINGS);
       setWeighHistory([]);
       setScaleState("balanced");
