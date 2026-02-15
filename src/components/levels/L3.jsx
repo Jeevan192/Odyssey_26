@@ -556,9 +556,9 @@ const Level3 = ({ onComplete }) => {
                   <span className="font-bold text-purple-700 dark:text-purple-300">
                     /rotate mirror
                   </span>{" "}
-                  <span className="text-blue-600 dark:text-blue-300">[45|90]</span>
+                  <span className="text-blue-600 dark:text-blue-300">[angle]</span>
                   <p className="mt-1 text-gray-600 dark:text-gray-300">
-                    Set the mirror angle to 45° or 90°.
+                    Set the mirror angle.
                   </p>
                 </div>
 
