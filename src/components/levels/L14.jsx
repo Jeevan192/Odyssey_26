@@ -289,6 +289,8 @@ const CommandSnake = ({ levelNumber, onComplete, nextLevelNumber }) => {
           <ArrowRight className="w-5 h-5" />
         </Button>
       </motion.div>
+        </div>
+      </div>
 
       <Dialog open={isHelpModalOpen} onOpenChange={setHelpModalOpen}>
         <DialogContent className="sm:max-w-[425px]">
