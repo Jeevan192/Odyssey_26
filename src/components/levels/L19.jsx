@@ -42,10 +42,8 @@ const Level19 = ({ onComplete }) => {
             toast({
                 title: "Traffic Fixed! 🚦✅",
                 description: "The jammed road now has green. Traffic is flowing!",
-                variant: "success",
-                className:
-                    "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white opacity-100 border-0 shadow-lg",
-            });
+                variant: "success"
+      });
             setTimeout(() => {
                 onComplete(4);
             }, 2000);
@@ -76,19 +74,15 @@ const Level19 = ({ onComplete }) => {
                 toast({
                     title: `${dir.charAt(0).toUpperCase() + dir.slice(1)} is already red`,
                     description: "No change needed.",
-                    variant: "default",
-                    className:
-                        "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-                });
+                    variant: "default"
+      });
             } else {
                 setSignals((prev) => ({ ...prev, [dir]: "red" }));
                 toast({
                     title: `🔴 ${dir.charAt(0).toUpperCase() + dir.slice(1)} → RED`,
                     description: `${dir.charAt(0).toUpperCase() + dir.slice(1)} road signal set to red.`,
-                    variant: "default",
-                    className:
-                        "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-                });
+                    variant: "default"
+      });
             }
         } else if (greenMatch) {
             const dir = greenMatch[1].toLowerCase();
@@ -96,19 +90,15 @@ const Level19 = ({ onComplete }) => {
                 toast({
                     title: `${dir.charAt(0).toUpperCase() + dir.slice(1)} is already green`,
                     description: "No change needed.",
-                    variant: "default",
-                    className:
-                        "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-                });
+                    variant: "default"
+      });
             } else {
                 setSignals((prev) => ({ ...prev, [dir]: "green" }));
                 toast({
                     title: `🟢 ${dir.charAt(0).toUpperCase() + dir.slice(1)} → GREEN`,
                     description: `${dir.charAt(0).toUpperCase() + dir.slice(1)} road signal set to green.`,
-                    variant: "default",
-                    className:
-                        "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-                });
+                    variant: "default"
+      });
             }
         } else if (resetMatch) {
             setSignals({ top: "green", right: "red", bottom: "red", left: "red" });
@@ -116,20 +106,16 @@ const Level19 = ({ onComplete }) => {
             toast({
                 title: "Level Reset",
                 description: "Signals restored to initial state.",
-                variant: "default",
-                className:
-                    "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-            });
+                variant: "default"
+      });
         } else if (helpMatch) {
             setHelpModalOpen(true);
         } else {
             toast({
                 title: "Unknown Command",
                 description: "Type /help to see available commands",
-                variant: "destructive",
-                className:
-                    "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
-            });
+                variant: "destructive"
+      });
         }
 
         setInputValue("");

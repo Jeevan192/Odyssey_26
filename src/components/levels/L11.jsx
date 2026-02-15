@@ -25,9 +25,7 @@ const Level11 = ({ onComplete }) => {
       toast({
         title: "Paper Revealed! 📄✨",
         description: `The code was "${HIDDEN_CODE}". Door unlocked!`,
-        variant: "success",
-        className:
-          "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white opacity-100 border-0 shadow-lg",
+        variant: "success"
       });
       setTimeout(() => {
         onComplete(4);
@@ -71,19 +69,15 @@ const Level11 = ({ onComplete }) => {
         toast({
           title: "Turn off the fan first!",
           description: "You can't rotate the fan while it's running.",
-          variant: "destructive",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
-        });
+          variant: "destructive"
+      });
       } else {
         setFanDir(dir);
         toast({
           title: `Fan turned ${dir}`,
           description: `The fan now faces ${dir === "left" ? "toward the paper" : "away from the paper"}.`,
-          variant: "default",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-        });
+          variant: "default"
+      });
       }
     } else if (powerMatch) {
       const state = powerMatch[1].toLowerCase();
@@ -96,44 +90,34 @@ const Level11 = ({ onComplete }) => {
             toast({
               title: "💨 Dust blown away!",
               description: `A code is revealed on the paper: "${HIDDEN_CODE}". Use /enter to submit it!`,
-              variant: "default",
-              className:
-                "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-            });
+              variant: "default"
+      });
           }, 1200);
           toast({
             title: "Fan powered on! 💨",
             description: "The fan is blowing toward the paper...",
-            variant: "default",
-            className:
-              "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-          });
+            variant: "default"
+      });
         } else if (fanDir === "center") {
           toast({
             title: "Fan powered on! 💨",
             description: "The fan is blowing in your face... not very useful.",
-            variant: "default",
-            className:
-              "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-          });
+            variant: "default"
+      });
         } else {
           toast({
             title: "Fan powered on! 💨",
             description: "The fan is blowing to the right... away from the paper.",
-            variant: "default",
-            className:
-              "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-          });
+            variant: "default"
+      });
         }
       } else {
         setFanOn(false);
         toast({
           title: "Fan powered off",
           description: "The fan stops spinning.",
-          variant: "default",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-        });
+          variant: "default"
+      });
       }
     } else if (enterMatch) {
       const guess = enterMatch[1].trim().toUpperCase();
@@ -141,20 +125,16 @@ const Level11 = ({ onComplete }) => {
         toast({
           title: "No code visible",
           description: "The paper is still covered in dust. Blow it away first!",
-          variant: "destructive",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
-        });
+          variant: "destructive"
+      });
       } else if (guess === HIDDEN_CODE) {
         setIsSuccess(true);
       } else {
         toast({
           title: "Wrong code ❌",
           description: `"${guess}" is not what the paper says. Look carefully!`,
-          variant: "destructive",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
-        });
+          variant: "destructive"
+      });
       }
     } else if (resetMatch) {
       setFanDir("center");
@@ -165,9 +145,7 @@ const Level11 = ({ onComplete }) => {
       toast({
         title: "Level Reset",
         description: "Everything restored. The paper is dusty again.",
-        variant: "default",
-        className:
-          "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
+        variant: "default"
       });
     } else if (helpMatch) {
       setHelpModalOpen(true);
@@ -175,9 +153,7 @@ const Level11 = ({ onComplete }) => {
       toast({
         title: "Unknown Command",
         description: "Type /help to see available commands",
-        variant: "destructive",
-        className:
-          "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
+        variant: "destructive"
       });
     }
 

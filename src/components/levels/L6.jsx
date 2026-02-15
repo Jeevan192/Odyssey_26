@@ -28,9 +28,7 @@ const Level6 = ({ onComplete }) => {
       toast({
         title: "Access Granted 🔓",
         description: `Correct Number: ${correctNumber}`,
-        variant: "success",
-        className:
-          "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white shadow-lg",
+        variant: "success"
       });
 
       setTimeout(() => {
@@ -56,10 +54,8 @@ const Level6 = ({ onComplete }) => {
         toast({
           title: "Incorrect ❌",
           description: `"${guess}" is not correct.`,
-          variant: "destructive",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white shadow-lg",
-        });
+          variant: "destructive"
+      });
       }
     } else if (resetMatch) {
       setBits(generateRandomBits());

@@ -21,10 +21,8 @@ const Level18 = ({ onComplete }) => {
             toast({
                 title: "Landmark Identified! 🏔️",
                 description: "The Hollywood Sign — Los Angeles, California!",
-                variant: "success",
-                className:
-                    "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white opacity-100 border-0 shadow-lg",
-            });
+                variant: "success"
+      });
             setTimeout(() => {
                 onComplete(4);
             }, 2000);
@@ -55,10 +53,8 @@ const Level18 = ({ onComplete }) => {
             toast({
                 title: "📍 Location traced!",
                 description: "Visual data recovered. An image has appeared on screen.",
-                variant: "default",
-                className:
-                    "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-            });
+                variant: "default"
+      });
         } else if (submitMatch) {
             const guess = submitMatch[1].trim().toLowerCase();
             if (CORRECT_ANSWERS.includes(guess)) {
@@ -67,20 +63,16 @@ const Level18 = ({ onComplete }) => {
                 toast({
                     title: "Incorrect ❌",
                     description: `"${submitMatch[1].trim()}" is not the landmark. Use the coordinates and image.`,
-                    variant: "destructive",
-                    className:
-                        "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
-                });
+                    variant: "destructive"
+      });
             }
         } else if (hintMatch) {
             setHintUsed(true);
             toast({
                 title: "Hint 💡",
                 description: "This famous landmark sits on a hillside in Los Angeles and is made of giant white letters.",
-                variant: "default",
-                className:
-                    "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-            });
+                variant: "default"
+      });
         } else if (resetMatch) {
             setLocated(false);
             setHintUsed(false);
@@ -88,20 +80,16 @@ const Level18 = ({ onComplete }) => {
             toast({
                 title: "Level Reset",
                 description: "Transmission data restored.",
-                variant: "default",
-                className:
-                    "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-            });
+                variant: "default"
+      });
         } else if (helpMatch) {
             setHelpModalOpen(true);
         } else {
             toast({
                 title: "Unknown Command",
                 description: "Type /help to see available commands",
-                variant: "destructive",
-                className:
-                    "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
-            });
+                variant: "destructive"
+      });
         }
 
         setInputValue("");

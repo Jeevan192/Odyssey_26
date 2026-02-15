@@ -22,9 +22,7 @@ const Level14 = ({ onComplete }) => {
       toast({
         title: "Access Granted! 🔓",
         description: "The password was \"unlock\"!",
-        variant: "success",
-        className:
-          "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white opacity-100 border-0 shadow-lg",
+        variant: "success"
       });
       setTimeout(() => {
         onComplete(4);
@@ -57,40 +55,32 @@ const Level14 = ({ onComplete }) => {
         toast({
           title: "Max brightness!",
           description: "The screen is already at full brightness.",
-          variant: "default",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-        });
+          variant: "default"
+      });
       } else {
         setBrightness((b) => b + 1);
         setHasLooked(false);
         toast({
           title: `Brightness: ${brightness + 1}/${MAX_BRIGHTNESS} ☀️`,
           description: brightness + 1 >= 3 ? "The screen is getting readable..." : "Still quite dim...",
-          variant: "default",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-        });
+          variant: "default"
+      });
       }
     } else if (decreaseBright) {
       if (brightness <= 0) {
         toast({
           title: "Already off!",
           description: "The screen can't get any darker.",
-          variant: "default",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-        });
+          variant: "default"
+      });
       } else {
         setBrightness((b) => b - 1);
         setHasLooked(false);
         toast({
           title: `Brightness: ${brightness - 1}/${MAX_BRIGHTNESS}`,
           description: "The screen dims...",
-          variant: "default",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-        });
+          variant: "default"
+      });
       }
     } else if (lookMatch) {
       setHasLooked(true);
@@ -98,26 +88,20 @@ const Level14 = ({ onComplete }) => {
         toast({
           title: "Too dark! 🌑",
           description: "You can't see anything. The screen is completely black.",
-          variant: "destructive",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
-        });
+          variant: "destructive"
+      });
       } else if (brightness <= 2) {
         toast({
           title: "Barely visible... 👀",
           description: "You can make out a faint message but can't read it clearly.",
-          variant: "default",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-        });
+          variant: "default"
+      });
       } else {
         toast({
           title: "You can see the password! 👁️",
           description: "The screen reads: \"unlock\"",
-          variant: "default",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-        });
+          variant: "default"
+      });
       }
     } else if (enterMatch) {
       const guess = enterMatch[1].trim().toLowerCase();
@@ -129,10 +113,8 @@ const Level14 = ({ onComplete }) => {
           description: brightness < 3
             ? "Can you even read what's on screen?"
             : `"${guess}" is incorrect. Look at the screen carefully.`,
-          variant: "destructive",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
-        });
+          variant: "destructive"
+      });
       }
     } else if (resetMatch) {
       setBrightness(0);
@@ -141,9 +123,7 @@ const Level14 = ({ onComplete }) => {
       toast({
         title: "Level Reset",
         description: "Screen returned to black.",
-        variant: "default",
-        className:
-          "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
+        variant: "default"
       });
     } else if (helpMatch) {
       setHelpModalOpen(true);
@@ -151,9 +131,7 @@ const Level14 = ({ onComplete }) => {
       toast({
         title: "Unknown Command",
         description: "Type /help to see available commands",
-        variant: "destructive",
-        className:
-          "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
+        variant: "destructive"
       });
     }
 

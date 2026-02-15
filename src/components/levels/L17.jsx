@@ -23,10 +23,8 @@ const Level17 = ({ onComplete }) => {
             toast({
                 title: "Correct! 🎵",
                 description: "Never gonna give you up! — Rick Astley, 1987",
-                variant: "success",
-                className:
-                    "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white opacity-100 border-0 shadow-lg",
-            });
+                variant: "success"
+      });
             setTimeout(() => {
                 onComplete(4);
             }, 2000);
@@ -77,48 +75,38 @@ const Level17 = ({ onComplete }) => {
                 toast({
                     title: "Already playing 🎶",
                     description: "The music is already playing...",
-                    variant: "default",
-                    className:
-                        "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-                });
+                    variant: "default"
+      });
             } else {
                 setIsPlaying(true);
                 toast({
                     title: "▶ Now Playing",
                     description: "♪ Never Gonna Give You Up ♪",
-                    variant: "default",
-                    className:
-                        "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-                });
+                    variant: "default"
+      });
             }
         } else if (pauseMatch) {
             if (!isPlaying) {
                 toast({
                     title: "Already paused ⏸",
                     description: "The music is already paused.",
-                    variant: "default",
-                    className:
-                        "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-                });
+                    variant: "default"
+      });
             } else {
                 setIsPlaying(false);
                 toast({
                     title: "⏸ Paused",
                     description: "Music paused.",
-                    variant: "default",
-                    className:
-                        "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-                });
+                    variant: "default"
+      });
             }
         } else if (viewMatch) {
             setDetailsViewed(true);
             toast({
                 title: "Track Details 📋",
                 description: "Title: Never Gonna Give You Up\nArtist: R. Astley\nAlbum: Whenever You Need Somebody\nYear: 1987\nGenre: Pop/Dance",
-                variant: "default",
-                className:
-                    "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-            });
+                variant: "default"
+      });
         } else if (enterMatch) {
             const guess = enterMatch[1].trim().toLowerCase();
             if (guess === CORRECT_NAME) {
@@ -127,10 +115,8 @@ const Level17 = ({ onComplete }) => {
                 toast({
                     title: "Wrong name ❌",
                     description: `"${enterMatch[1].trim()}" is not correct. Check the artist info.`,
-                    variant: "destructive",
-                    className:
-                        "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
-                });
+                    variant: "destructive"
+      });
             }
         } else if (resetMatch) {
             setIsPlaying(false);
@@ -140,20 +126,16 @@ const Level17 = ({ onComplete }) => {
             toast({
                 title: "Level Reset",
                 description: "Music player restored.",
-                variant: "default",
-                className:
-                    "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-            });
+                variant: "default"
+      });
         } else if (helpMatch) {
             setHelpModalOpen(true);
         } else {
             toast({
                 title: "Unknown Command",
                 description: "Type /help to see available commands",
-                variant: "destructive",
-                className:
-                    "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
-            });
+                variant: "destructive"
+      });
         }
 
         setInputValue("");

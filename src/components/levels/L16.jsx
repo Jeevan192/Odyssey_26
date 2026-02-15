@@ -22,10 +22,8 @@ const Level16 = ({ onComplete }) => {
             toast({
                 title: "Correct! 🖼️✨",
                 description: `The hidden word was "${HIDDEN_WORD}"!`,
-                variant: "success",
-                className:
-                    "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white opacity-100 border-0 shadow-lg",
-            });
+                variant: "success"
+      });
             setTimeout(() => {
                 onComplete(4);
             }, 2000);
@@ -58,18 +56,14 @@ const Level16 = ({ onComplete }) => {
                 toast({
                     title: "Inspecting the image... 🔍",
                     description: "A plain brick wall. Nothing visible... but the texture looks slightly uneven in places. Something might be hidden.",
-                    variant: "default",
-                    className:
-                        "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-                });
+                    variant: "default"
+      });
             } else {
                 toast({
                     title: "Inspecting the inverted image... 🔍",
                     description: "With colors inverted, you can clearly see letters formed in the wall pattern!",
-                    variant: "default",
-                    className:
-                        "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-                });
+                    variant: "default"
+      });
             }
         } else if (invertMatch) {
             setInverted((prev) => !prev);
@@ -78,28 +72,22 @@ const Level16 = ({ onComplete }) => {
                 description: !inverted
                     ? "The image flips to negative. New details appear..."
                     : "Back to the original image.",
-                variant: "default",
-                className:
-                    "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-            });
+                variant: "default"
+      });
         } else if (readMatch) {
             if (!inverted) {
                 toast({
                     title: "No message visible",
                     description: "You squint at the wall but can't make out any text...",
-                    variant: "destructive",
-                    className:
-                        "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
-                });
+                    variant: "destructive"
+      });
             } else {
                 setMessageRead(true);
                 toast({
                     title: "Message Revealed! 👁️",
                     description: `The inverted image reveals the word: "${HIDDEN_WORD}"`,
-                    variant: "default",
-                    className:
-                        "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-                });
+                    variant: "default"
+      });
             }
         } else if (enterMatch) {
             const guess = enterMatch[1].trim().toUpperCase();
@@ -109,10 +97,8 @@ const Level16 = ({ onComplete }) => {
                 toast({
                     title: "Wrong word ❌",
                     description: `"${guess}" is not correct. Look at the image more carefully.`,
-                    variant: "destructive",
-                    className:
-                        "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
-                });
+                    variant: "destructive"
+      });
             }
         } else if (resetMatch) {
             setInverted(false);
@@ -122,20 +108,16 @@ const Level16 = ({ onComplete }) => {
             toast({
                 title: "Level Reset",
                 description: "Image restored to original.",
-                variant: "default",
-                className:
-                    "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-            });
+                variant: "default"
+      });
         } else if (helpMatch) {
             setHelpModalOpen(true);
         } else {
             toast({
                 title: "Unknown Command",
                 description: "Type /help to see available commands",
-                variant: "destructive",
-                className:
-                    "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
-            });
+                variant: "destructive"
+      });
         }
 
         setInputValue("");

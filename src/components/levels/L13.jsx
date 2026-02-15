@@ -32,9 +32,7 @@ const Level13 = ({ onComplete }) => {
       toast({
         title: "Access Granted! 🖥️✨",
         description: "You changed the system clock and logged in!",
-        variant: "success",
-        className:
-          "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white opacity-100 border-0 shadow-lg",
+        variant: "success"
       });
       setTimeout(() => {
         onComplete(4);
@@ -84,10 +82,8 @@ const Level13 = ({ onComplete }) => {
         toast({
           title: "Access Denied ❌",
           description: `Current time is ${formatTime(currentHour, currentMin)}. Working hours are 09:00–17:00.`,
-          variant: "destructive",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
-        });
+          variant: "destructive"
+      });
       }
     } else if (openSettingsMatch) {
       addLine(`> /open settings`, "#A78BFA");
@@ -108,10 +104,8 @@ const Level13 = ({ onComplete }) => {
         toast({
           title: "Settings not open",
           description: "Open settings first with /open settings",
-          variant: "destructive",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
-        });
+          variant: "destructive"
+      });
       } else if (h < 0 || h > 23 || m < 0 || m > 59) {
         addLine("✗ Invalid time. Use format HH:MM (00:00 – 23:59).", "#ef4444");
       } else {
@@ -128,10 +122,8 @@ const Level13 = ({ onComplete }) => {
           description: isWorkingHours(h)
             ? "Now within working hours! Try /login"
             : "Still outside working hours.",
-          variant: "default",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-        });
+          variant: "default"
+      });
       }
     } else if (resetMatch) {
       setCurrentHour(2);
@@ -150,9 +142,7 @@ const Level13 = ({ onComplete }) => {
       toast({
         title: "Level Reset",
         description: "Terminal restored to initial state.",
-        variant: "default",
-        className:
-          "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
+        variant: "default"
       });
     } else if (helpMatch) {
       setHelpModalOpen(true);

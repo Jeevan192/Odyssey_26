@@ -21,9 +21,7 @@ const Level12 = ({ onComplete }) => {
       toast({
         title: "Drawer Unlocked! 🔓",
         description: "The PIN was 0720 — July 20th!",
-        variant: "success",
-        className:
-          "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white opacity-100 border-0 shadow-lg",
+        variant: "success"
       });
       setTimeout(() => {
         onComplete(4);
@@ -55,10 +53,8 @@ const Level12 = ({ onComplete }) => {
         toast({
           title: "Invalid PIN",
           description: "The keypad accepts exactly 4 digits.",
-          variant: "destructive",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
-        });
+          variant: "destructive"
+      });
       } else if (pin === CORRECT_PIN) {
         setIsSuccess(true);
       } else {
@@ -68,10 +64,8 @@ const Level12 = ({ onComplete }) => {
         toast({
           title: "Wrong PIN ❌",
           description: `"${pin}" is incorrect. Think about the date...`,
-          variant: "destructive",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
-        });
+          variant: "destructive"
+      });
       }
     } else if (resetMatch) {
       setAttempts([]);
@@ -79,9 +73,7 @@ const Level12 = ({ onComplete }) => {
       toast({
         title: "Level Reset",
         description: "Try again from scratch.",
-        variant: "default",
-        className:
-          "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
+        variant: "default"
       });
     } else if (helpMatch) {
       setHelpModalOpen(true);
@@ -89,9 +81,7 @@ const Level12 = ({ onComplete }) => {
       toast({
         title: "Unknown Command",
         description: "Type /help to see available commands",
-        variant: "destructive",
-        className:
-          "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
+        variant: "destructive"
       });
     }
 

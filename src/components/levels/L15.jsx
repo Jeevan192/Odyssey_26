@@ -24,9 +24,7 @@ const Level15 = ({ onComplete }) => {
       toast({
         title: "Keypad Unlocked! 🔓",
         description: `PIN ${CORRECT_PIN} accepted!`,
-        variant: "success",
-        className:
-          "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white opacity-100 border-0 shadow-lg",
+        variant: "success"
       });
       setTimeout(() => {
         onComplete(4);
@@ -60,27 +58,21 @@ const Level15 = ({ onComplete }) => {
         toast({
           title: "Nothing happened",
           description: "You press the key but the display doesn't change...",
-          variant: "default",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-        });
+          variant: "default"
+      });
       } else if (enteredDigits.length >= 4) {
         toast({
           title: "Display full",
           description: "Already 4 digits entered. Use /submit or /reset.",
-          variant: "default",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-        });
+          variant: "default"
+      });
       } else {
         setEnteredDigits((prev) => [...prev, digit]);
         toast({
           title: `Digit entered: ${digit}`,
           description: `Display: ${[...enteredDigits, digit].join("")}${"–".repeat(4 - enteredDigits.length - 1)}`,
-          variant: "default",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-        });
+          variant: "default"
+      });
       }
     } else if (toggleMatch) {
       setNumLock((prev) => !prev);
@@ -89,19 +81,15 @@ const Level15 = ({ onComplete }) => {
         description: !numLock
           ? "The Num Lock LED lights up green. Number keys should work now!"
           : "The Num Lock LED goes dark.",
-        variant: "default",
-        className:
-          "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
+        variant: "default"
       });
     } else if (submitMatch) {
       if (enteredDigits.length < 4) {
         toast({
           title: "Not enough digits",
           description: `Only ${enteredDigits.length}/4 digits entered.`,
-          variant: "destructive",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
-        });
+          variant: "destructive"
+      });
       } else {
         const pin = enteredDigits.join("");
         if (pin === CORRECT_PIN) {
@@ -113,10 +101,8 @@ const Level15 = ({ onComplete }) => {
           toast({
             title: "Wrong PIN ❌",
             description: `"${pin}" is incorrect. Display cleared.`,
-            variant: "destructive",
-            className:
-              "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
-          });
+            variant: "destructive"
+      });
         }
       }
     } else if (lookMatch) {
@@ -125,18 +111,14 @@ const Level15 = ({ onComplete }) => {
         toast({
           title: "You examine the keypad... 👀",
           description: "Three LEDs at the top. Num Lock is OFF. The display shows \"----\". There's a sticky note on the wall: \"PIN: 2580\"",
-          variant: "default",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-        });
+          variant: "default"
+      });
       } else {
         toast({
           title: "You examine the keypad... 👀",
           description: `Num Lock is ON. Display: ${enteredDigits.length > 0 ? enteredDigits.join("") : "----"}. Sticky note: \"PIN: 2580\"`,
-          variant: "default",
-          className:
-            "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
-        });
+          variant: "default"
+      });
       }
     } else if (resetMatch) {
       setNumLock(false);
@@ -146,9 +128,7 @@ const Level15 = ({ onComplete }) => {
       toast({
         title: "Level Reset",
         description: "Keypad restored. Num Lock OFF.",
-        variant: "default",
-        className:
-          "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-white dark:bg-[#2D1B4B] opacity-100 shadow-lg",
+        variant: "default"
       });
     } else if (helpMatch) {
       setHelpModalOpen(true);
@@ -156,9 +136,7 @@ const Level15 = ({ onComplete }) => {
       toast({
         title: "Unknown Command",
         description: "Type /help to see available commands",
-        variant: "destructive",
-        className:
-          "fixed bottom-12 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white opacity-100 shadow-lg",
+        variant: "destructive"
       });
     }
 
