@@ -11,10 +11,10 @@ import { useCommandHistory } from "@/hooks/useCommandHistory";
 // Top-Left: C (deep purple)   | Top-Right: O (purple)
 // Bottom-Left: S (magenta)     | Bottom-Right: C (pink)
 const TILES = [
-  { id: 0, letter: "C", gradient: ["#594D9F", "#6A4E9E"], label: "C (deep purple)" },
-  { id: 1, letter: "O", gradient: ["#714C9C", "#8E3D94"], label: "O (purple)" },
-  { id: 2, letter: "S", gradient: ["#A9329D", "#C22C89"], label: "S (magenta)" },
-  { id: 3, letter: "C", gradient: ["#D72087", "#E01C80"], label: "C (pink)" },
+  { id: 0, letter: "C", gradient: ["#594D9F", "#714C9C"], label: "C (deep purple)" },
+  { id: 1, letter: "O", gradient: ["#714C9C", "#C22C89"], label: "O (purple)" },
+  { id: 2, letter: "S", gradient: ["#714C9C", "#C22C89"], label: "S (magenta)" },
+  { id: 3, letter: "C", gradient: ["#C22C89", "#D72087"], label: "C (pink)" },
 ];
 
 // Solved order: [0, 1, 2, 3]
