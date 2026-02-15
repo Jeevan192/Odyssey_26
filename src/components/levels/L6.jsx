@@ -141,7 +141,7 @@ const Level6 = ({ onComplete }) => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="px-6 py-3 text-2xl font-bold text-[#2D1B4B] dark:text-[#1A0F2E] bg-gradient-to-r from-[#F9DC34] to-[#F5A623] rounded-full shadow-lg"
+        className="px-6 py-3 text-xl font-bold text-[#2D1B4B] dark:text-[#1A0F2E] bg-gradient-to-r from-[#F9DC34] to-[#F5A623] rounded-full shadow-lg"
       >
         Level 6
       </motion.h1>
@@ -153,8 +153,8 @@ const Level6 = ({ onComplete }) => {
         transition={{ duration: 0.6, delay: 0.2 }}
         className="mt-8 text-center mb-6"
       >
-        <p className="text-xl font-semibold text-purple-900 dark:text-[#F9DC34]">
-          Binary Bulbs — Recreate the number: <span className="text-2xl font-bold text-[#F9DC34]">{targetNumber}</span>
+        <p className="text-lg font-semibold text-purple-900 dark:text-[#F9DC34]">
+          Binary Bulbs — Recreate the number: <span className="text-xl font-bold text-[#F9DC34]">{targetNumber}</span>
         </p>
         <p className="text-sm text-purple-600 dark:text-purple-400 mt-2">
           Use switches to control binary bulbs

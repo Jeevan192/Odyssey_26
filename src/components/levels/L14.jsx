@@ -221,13 +221,13 @@ const CommandSnake = ({ levelNumber, onComplete, nextLevelNumber }) => {
   return (
     <div className="flex flex-col items-center mt-4 sm:mt-8 max-w-4xl mx-auto px-4">
       <motion.h1 
-        className="px-4 sm:px-6 py-2 sm:py-3 text-xl sm:text-2xl font-bold text-[#2D1B4B] dark:text-[#1A0F2E] bg-gradient-to-r from-[#F9DC34] to-[#F5A623] rounded-full shadow-lg"
+        className="px-4 sm:px-6 py-2 sm:py-3 text-lg sm:text-xl font-bold text-[#2D1B4B] dark:text-[#1A0F2E] bg-gradient-to-r from-[#F9DC34] to-[#F5A623] rounded-full shadow-lg"
       >
         Level 14
       </motion.h1>
 
       <motion.h1 
-        className="px-4 sm:px-6 py-2 sm:py-3 text-xl sm:text-2xl font-bold text-black dark:text-white rounded-full shadow-lg"
+        className="px-4 sm:px-6 py-2 sm:py-3 text-lg sm:text-xl font-bold text-black dark:text-white rounded-full shadow-lg"
       >
         Have Fun! Score 60
       </motion.h1>
