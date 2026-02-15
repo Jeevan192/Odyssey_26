@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
-import { motion, useAnimation } from "framer-motion";
+import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import { useToast } from "../ui/use-toast";
+import { useTheme } from "next-themes";
 
 // Flower types positioned across the garden
 const FLOWERS = [
@@ -19,12 +20,15 @@ const Level2 = ({ onComplete }) => {
   const [inputValue, setInputValue] = useState("");
   const [isHelpModalOpen, setHelpModalOpen] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [hasLooked, setHasLooked] = useState(false);
+  const [hasObserved, setHasObserved] = useState(false);
+  const [isDarkScene, setIsDarkScene] = useState(false);
   const [sunAnimating, setSunAnimating] = useState(false);
-  const [sunX, setSunX] = useState(40); // sun starts at left
   const { toast } = useToast();
+  const { setTheme } = useTheme();
   const sunControls = useAnimation();
   const sunflowerControls = useAnimation();
+  const petalControls = useAnimation();
+  const stemControls = useAnimation();
 
   useEffect(() => {
     if (isSuccess) {
@@ -40,51 +44,70 @@ const Level2 = ({ onComplete }) => {
     }
   }, [isSuccess, onComplete, toast]);
 
-  const animateSun = async () => {
+  const handleThemeChange = async (mode) => {
     if (sunAnimating) return;
     setSunAnimating(true);
-    setHasLooked(true);
+    setHasObserved(true);
 
-    // Sun moves from left to right
-    await sunControls.start({
-      x: [0, 300],
-      transition: { duration: 4, ease: "easeInOut" }});
-
-    // Sunflower head tracks the sun during the animation
-    await sunflowerControls.start({
-      rotate: [0, -20, 0, 20, 35],
-      transition: { duration: 4, ease: "easeInOut" }});
-
-    setSunAnimating(false);
-  };
-
-  // Run both animations concurrently when /look is used
-  const handleLook = async () => {
-    if (sunAnimating) return;
-    setSunAnimating(true);
-    setHasLooked(true);
-
-    // Animate both concurrently
-    await Promise.all([
-      sunControls.start({
-        x: [0, 300],
-        transition: { duration: 4, ease: "easeInOut" }}),
-      sunflowerControls.start({
-        rotate: [-25, 0, 25, 40],
-        transition: { duration: 4, ease: "easeInOut" }}),
-    ]);
-
-    // Reset sun back to start after animation
-    await sunControls.start({ x: 0, transition: { duration: 0 } });
-    await sunflowerControls.start({ rotate: 0, transition: { duration: 0.5 } });
-
-    setSunAnimating(false);
-
-    toast({
-      title: "Observation",
-      description: "The sun moved across the sky... did you notice anything?",
-      variant: "default"
+    if (mode === "dark") {
+      setTheme("dark");
+      setIsDarkScene(true);
+      // Sun sets, sunflower droops and petals close
+      await Promise.all([
+        sunControls.start({
+          y: [0, 160],
+          opacity: [1, 0],
+          transition: { duration: 2.5, ease: "easeInOut" },
+        }),
+        sunflowerControls.start({
+          rotate: [0, 20, 45],
+          transition: { duration: 2.5, ease: "easeInOut" },
+        }),
+        petalControls.start({
+          scale: [1, 0.5, 0.2],
+          transition: { duration: 2.5, ease: "easeInOut" },
+        }),
+        stemControls.start({
+          d: "M185,155 Q175,125 170,100",
+          transition: { duration: 2.5, ease: "easeInOut" },
+        }),
+      ]);
+      toast({
+        title: "🌙 Night falls",
+        description: "The sun has set... did any flower react to the change?",
+        variant: "default",
       });
+    } else {
+      setTheme("light");
+      setIsDarkScene(false);
+      // Sun rises, sunflower perks up and petals open
+      await Promise.all([
+        sunControls.start({
+          y: [160, 0],
+          opacity: [0, 1],
+          transition: { duration: 2.5, ease: "easeInOut" },
+        }),
+        sunflowerControls.start({
+          rotate: [45, 20, 0],
+          transition: { duration: 2.5, ease: "easeInOut" },
+        }),
+        petalControls.start({
+          scale: [0.2, 0.5, 1],
+          transition: { duration: 2.5, ease: "easeInOut" },
+        }),
+        stemControls.start({
+          d: "M185,155 Q185,125 185,95",
+          transition: { duration: 2.5, ease: "easeInOut" },
+        }),
+      ]);
+      toast({
+        title: "☀️ Dawn breaks",
+        description: "The sun has risen... did any flower react to the light?",
+        variant: "default",
+      });
+    }
+
+    setSunAnimating(false);
   };
 
   const handleInputChange = (e) => {
@@ -100,13 +123,13 @@ const Level2 = ({ onComplete }) => {
   const handleCommandSubmit = () => {
     const cmd = inputValue.trim().toLowerCase();
 
-    const lookMatch = cmd.match(/^\/look$/i);
+    const themeMatch = cmd.match(/^\/theme\s+(dark|light)$/i);
     const enterMatch = cmd.match(/^\/enter\s+(.+)$/i);
     const resetMatch = cmd.match(/^\/reset$/i);
     const helpMatch = cmd.match(/^\/help$/i);
 
-    if (lookMatch) {
-      handleLook();
+    if (themeMatch) {
+      handleThemeChange(themeMatch[1].toLowerCase());
     } else if (enterMatch) {
       const answer = enterMatch[1].trim().toLowerCase();
       if (answer === "sunflower") {
@@ -119,9 +142,13 @@ const Level2 = ({ onComplete }) => {
       });
       }
     } else if (resetMatch) {
-      setHasLooked(false);
-      sunControls.start({ x: 0, transition: { duration: 0 } });
+      setHasObserved(false);
+      setIsDarkScene(false);
+      setTheme("light");
+      sunControls.start({ y: 0, opacity: 1, transition: { duration: 0 } });
       sunflowerControls.start({ rotate: 0, transition: { duration: 0 } });
+      petalControls.start({ scale: 1, transition: { duration: 0 } });
+      stemControls.start({ d: "M185,155 Q185,125 185,95", transition: { duration: 0 } });
       toast({
         title: "Level Reset",
         description: "The garden has been reset.",
@@ -153,15 +180,26 @@ const Level2 = ({ onComplete }) => {
     return (
       <g key={flower.id}>
         {/* Stem */}
-        <line
-          x1={flower.x}
-          y1={groundY}
-          x2={flower.x}
-          y2={groundY - stemHeight}
-          stroke="#4CAF50"
-          strokeWidth="3"
-          strokeLinecap="round"
-        />
+        {isSunflower ? (
+          <motion.path
+            animate={stemControls}
+            d="M185,155 Q185,125 185,95"
+            stroke="#4CAF50"
+            strokeWidth="3"
+            strokeLinecap="round"
+            fill="none"
+          />
+        ) : (
+          <line
+            x1={flower.x}
+            y1={groundY}
+            x2={flower.x}
+            y2={groundY - stemHeight}
+            stroke="#4CAF50"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+        )}
         {/* Leaves */}
         <ellipse
           cx={flower.x - 10}
@@ -186,19 +224,24 @@ const Level2 = ({ onComplete }) => {
             animate={sunflowerControls}
             style={{ originX: `${flower.x}px`, originY: `${groundY - stemHeight}px` }}
           >
-            {/* Sunflower petals */}
-            {[...Array(10)].map((_, i) => (
-              <ellipse
-                key={i}
-                cx={flower.x + Math.cos((i * 36 * Math.PI) / 180) * 14}
-                cy={groundY - stemHeight + Math.sin((i * 36 * Math.PI) / 180) * 14}
-                rx="7"
-                ry="4"
-                fill={flower.color}
-                transform={`rotate(${i * 36}, ${flower.x + Math.cos((i * 36 * Math.PI) / 180) * 14
-                  }, ${groundY - stemHeight + Math.sin((i * 36 * Math.PI) / 180) * 14})`}
-              />
-            ))}
+            {/* Sunflower petals — animate scale to close/open */}
+            <motion.g
+              animate={petalControls}
+              style={{ originX: `${flower.x}px`, originY: `${groundY - stemHeight}px` }}
+            >
+              {[...Array(10)].map((_, i) => (
+                <ellipse
+                  key={i}
+                  cx={flower.x + Math.cos((i * 36 * Math.PI) / 180) * 14}
+                  cy={groundY - stemHeight + Math.sin((i * 36 * Math.PI) / 180) * 14}
+                  rx="7"
+                  ry="4"
+                  fill={flower.color}
+                  transform={`rotate(${i * 36}, ${flower.x + Math.cos((i * 36 * Math.PI) / 180) * 14
+                    }, ${groundY - stemHeight + Math.sin((i * 36 * Math.PI) / 180) * 14})`}
+                />
+              ))}
+            </motion.g>
             {/* Sunflower center */}
             <circle
               cx={flower.x}
@@ -358,8 +401,30 @@ const Level2 = ({ onComplete }) => {
           {/* Flowers */}
           {FLOWERS.map((flower) => renderFlower(flower))}
 
-          {/* Instruction overlay if not looked yet */}
-          {!hasLooked && (
+          {/* Moon (visible when dark) */}
+          <AnimatePresence>
+            {isDarkScene && (
+              <motion.g
+                initial={{ opacity: 0, y: -30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -30 }}
+                transition={{ duration: 1.5 }}
+              >
+                <circle cx="320" cy="40" r="18" fill="#F5F5DC" />
+                <circle cx="310" cy="35" r="18" fill="#1a2744" />
+                {/* Stars */}
+                <circle cx="100" cy="25" r="1.5" fill="white" opacity="0.8" />
+                <circle cx="160" cy="50" r="1" fill="white" opacity="0.6" />
+                <circle cx="250" cy="20" r="1.5" fill="white" opacity="0.7" />
+                <circle cx="350" cy="70" r="1" fill="white" opacity="0.5" />
+                <circle cx="60" cy="55" r="1" fill="white" opacity="0.6" />
+                <circle cx="200" cy="35" r="1.5" fill="white" opacity="0.7" />
+              </motion.g>
+            )}
+          </AnimatePresence>
+
+          {/* Instruction overlay if not observed yet */}
+          {!hasObserved && (
             <text
               x="200"
               y="188"
@@ -369,7 +434,7 @@ const Level2 = ({ onComplete }) => {
               opacity="0.8"
               fontWeight="bold"
             >
-              Use /look to observe the garden
+              Use /theme dark or /theme light
             </text>
           )}
         </svg>
@@ -439,10 +504,11 @@ const Level2 = ({ onComplete }) => {
               <div className="space-y-1 mb-6">
                 <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg border-l-4 border-[#F5A623]">
                   <span className="font-bold text-purple-700 dark:text-purple-300">
-                    /look
-                  </span>
+                    /theme
+                  </span>{" "}
+                  <span className="text-blue-600 dark:text-blue-300">[dark/light]</span>
                   <p className="mt-1 text-gray-600 dark:text-gray-300">
-                    Observe the garden carefully.
+                    Switch between day and night. Watch the garden closely.
                   </p>
                 </div>
 
@@ -479,7 +545,7 @@ const Level2 = ({ onComplete }) => {
                 Hint:
               </h3>
               <p className="text-gray-600 dark:text-gray-300 italic">
-                One reacts to the light.
+                Toggle themes and observe — one flower follows the light.
               </p>
             </div>
 
