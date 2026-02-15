@@ -193,7 +193,7 @@ const CommandSnake = ({ levelNumber, onComplete, nextLevelNumber }) => {
     return board.map((row, rowIndex) => (
       <div key={rowIndex} className="flex">
         {row.map((cell, cellIndex) => {
-          let cellClass = "w-4 h-4 sm:w-5 sm:h-5 border border-gray-200";
+          let cellClass = "w-3 h-3 sm:w-5 sm:h-5 border border-gray-200";
           switch(cell) {
             case 1: 
               cellClass += " bg-green-600";
@@ -220,36 +220,54 @@ const CommandSnake = ({ levelNumber, onComplete, nextLevelNumber }) => {
 
   return (
     <div className="flex flex-col items-center mt-4 sm:mt-8 max-w-4xl mx-auto px-4">
-      <motion.h1 
-        className="px-4 sm:px-6 py-2 sm:py-3 text-lg sm:text-xl font-bold text-[#2D1B4B] dark:text-[#1A0F2E] bg-gradient-to-r from-[#F9DC34] to-[#F5A623] rounded-full shadow-lg"
-      >
-        Level 14
-      </motion.h1>
+      {/* Level title badge - now in sticky header */}
 
       <motion.h1 
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, type: "spring", stiffness: 120 }}
         className="px-4 sm:px-6 py-2 sm:py-3 text-lg sm:text-xl font-bold text-black dark:text-white rounded-full shadow-lg"
       >
         Have Fun! Score 60
       </motion.h1>
 
       <div className="flex items-center justify-between w-full max-w-md mt-2 sm:mt-4">
-        <span className="text-base sm:text-lg font-semibold">
+        <motion.span 
+          className="text-base sm:text-lg font-semibold"
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ duration: 0.5 }}
+          key={score}
+        >
           Score: {score}
-        </span>
+        </motion.span>
         {isPaused && (
-          <span className="text-yellow-600 font-bold text-sm sm:text-base">
+          <motion.span 
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="text-yellow-600 font-bold text-sm sm:text-base"
+          >
             PAUSED
-          </span>
+          </motion.span>
         )}
         {isGameOver && (
-          <span className="text-red-600 font-bold text-sm sm:text-base">
+          <motion.span 
+            initial={{ scale: 0 }}
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 0.5 }}
+            className="text-red-600 font-bold text-sm sm:text-base"
+          >
             GAME OVER
-          </span>
+          </motion.span>
         )}
         {isSuccess && (
-          <span className="text-green-600 font-bold text-sm sm:text-base">
+          <motion.span 
+            initial={{ scale: 0 }}
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 0.5 }}
+            className="text-green-600 font-bold text-sm sm:text-base"
+          >
             SUCCESS!
-          </span>
+          </motion.span>
         )}
       </div>
 

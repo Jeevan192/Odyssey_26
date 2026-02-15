@@ -106,15 +106,7 @@ const LevelTemplate = ({ levelNumber, onComplete, nextLevelNumber }) => {
 
   return (
     <div className="flex flex-col items-center mt-8 max-w-4xl mx-auto px-4">
-      {/* Header */}
-      <motion.h1 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="px-6 py-3 text-xl font-bold text-[#2D1B4B] dark:text-[#1A0F2E] bg-gradient-to-r from-[#F9DC34] to-[#F5A623] rounded-full shadow-lg"
-      >
-        Level {levelNumber}
-      </motion.h1>
+      {/* Level title badge - now in sticky header */}
       
       <motion.p 
         initial={{ opacity: 0 }}
@@ -195,7 +187,7 @@ const LevelTemplate = ({ levelNumber, onComplete, nextLevelNumber }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm"
+            className="fixed inset-0 z-[70] flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm"
           >
             <motion.div 
               initial={{ scale: 0.9 }}
@@ -238,7 +230,7 @@ const LevelTemplate = ({ levelNumber, onComplete, nextLevelNumber }) => {
                 </p>
               </div>
               
-              <div className="bg-purple-50 dark:bg-purple-900/30 px-6 py-4 text-center">
+              <div className="bg-purple-50 dark:bg-purple-900/30 px-6 py-4 text-center flex-shrink-0">
                 <button
                   onClick={() => setHelpModalOpen(false)}
                   className="bg-gradient-to-r from-[#F9DC34] to-[#F5A623] hover:from-[#FFE55C] hover:to-[#FFBD4A] px-6 py-2 rounded-lg text-purple-900 font-medium shadow-md transition-transform hover:scale-105"

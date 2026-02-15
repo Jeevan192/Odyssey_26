@@ -11,10 +11,10 @@ const ChessKnightLevel = ({ levelNumber, onComplete, nextLevelNumber }) => {
 
   const initialState = {
     board: [
-      ['♞', '🟩', '🟩', '🔴', '🟩'],
-      ['🟩', '🟩', '🔴', '🟩', '🟩'],
-      ['🟩', '🟩', '🏁', '🔴', '🟩'],
-      ['🟩', '🟩', '🔴', '🟩', '🟩'],
+      ['♞', '🟩', '🟩', '🟩', '🔴'],
+      ['🟩', '🟩', '🟩', '🔴', '🟩'],
+      ['🔴', '🟩', '🏁', '🟩', '🟩'],
+      ['🟩', '🟩', '🟩', '🔴', '🟩'],
       ['🟩', '🟩', '🟩', '🟩', '🟩']
     ],
     knightPosition: { x: 0, y: 0 },
@@ -82,9 +82,10 @@ const ChessKnightLevel = ({ levelNumber, onComplete, nextLevelNumber }) => {
     const { x, y } = newPosition;
 
     if (!isValidMove(x, y)) {
+      const chessSquare = `${BOARD_LETTERS[x]}${5 - y}`;
       toast({
         title: "Invalid Move",
-        description: "That move is not allowed for a knight!",
+        description: `Cannot move to ${chessSquare}. Knights move in an L-shape (2+1 squares)!`,
         variant: "destructive"
       });
       return;
@@ -174,48 +175,82 @@ const ChessKnightLevel = ({ levelNumber, onComplete, nextLevelNumber }) => {
   };
 
   const renderBoard = () => {
-    return gameState.board.map((row, y) => (
-      <div key={y} className="flex">
-        {row.map((cell, x) => (
-          <div 
-            key={`${x}-${y}`} 
-            className={`w-12 h-12 flex items-center justify-center border ${
-              gameState.knightPosition.x === x && gameState.knightPosition.y === y 
-                ? 'border-purple-500' 
-                : 'border-gray-200 dark:border-gray-700'
-            }`}
-          >
-            {cell}
+    return (
+      <div className="inline-block">
+        {/* Column labels (A-E) */}
+        <div className="flex">
+          <div className="w-8 h-8"></div> {/* Empty corner */}
+          {BOARD_LETTERS.map((letter) => (
+            <div 
+              key={letter} 
+              className="w-12 h-8 flex items-center justify-center font-bold text-purple-700 dark:text-purple-300"
+            >
+              {letter}
+            </div>
+          ))}
+        </div>
+        {/* Board rows with row numbers */}
+        {gameState.board.map((row, y) => (
+          <div key={y} className="flex">
+            {/* Row number (5 to 1, top to bottom) */}
+            <div className="w-8 h-12 flex items-center justify-center font-bold text-purple-700 dark:text-purple-300">
+              {5 - y}
+            </div>
+            {/* Board cells */}
+            {row.map((cell, x) => {
+              const isKnight = gameState.knightPosition.x === x && gameState.knightPosition.y === y;
+              const isVisited = gameState.visitedSquares.some(sq => sq.x === x && sq.y === y);
+              return (
+                <motion.div 
+                  key={`${x}-${y}`} 
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ 
+                    opacity: 1, 
+                    scale: isKnight ? [1, 1.1, 1] : 1,
+                    backgroundColor: isVisited ? 'rgba(249, 220, 52, 0.1)' : 'transparent'
+                  }}
+                  transition={{ 
+                    duration: 0.3,
+                    scale: { repeat: isKnight ? Infinity : 0, duration: 1.5 }
+                  }}
+                  className={`w-12 h-12 flex items-center justify-center border text-2xl ${
+                    isKnight
+                      ? 'border-purple-500 border-2 shadow-lg shadow-purple-500/50' 
+                      : 'border-gray-200 dark:border-gray-700'
+                  } ${isVisited && !isKnight ? 'bg-yellow-100 dark:bg-yellow-900/20' : ''}`}
+                >
+                  <motion.span
+                    animate={isKnight ? { rotate: [0, -10, 10, -10, 0] } : {}}
+                    transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 1 }}
+                  >
+                    {cell}
+                  </motion.span>
+                </motion.div>
+              );
+            })}
           </div>
         ))}
       </div>
-    ));
+    );
   };
 
   return (
     <div className="flex flex-col items-center mt-8 max-w-4xl mx-auto px-4">
-      <motion.h1 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="px-6 py-3 text-xl font-bold text-[#2D1B4B] dark:text-[#1A0F2E] bg-gradient-to-r from-[#F9DC34] to-[#F5A623] rounded-full shadow-lg"
-      >
-        Level 11
-      </motion.h1>
+      {/* Level title badge - now in sticky header */}
       
       <motion.p 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2, type: "spring", stiffness: 100 }}
         className="mt-8 text-lg font-semibold mb-4 text-center text-purple-900 dark:text-[#F9DC34]"
       >
         {message}
       </motion.p>
 
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
+        initial={{ opacity: 0, scale: 0.9, rotateX: 10 }}
+        animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+        transition={{ duration: 0.7, delay: 0.3, type: "spring", stiffness: 80 }}
         className="bg-white dark:bg-[#2D1B4B]/40 rounded-2xl p-6 shadow-lg backdrop-blur-sm border border-purple-200 dark:border-purple-700/30 w-full max-w-md"
       >
         <div className="flex flex-col items-center">
@@ -242,7 +277,7 @@ const ChessKnightLevel = ({ levelNumber, onComplete, nextLevelNumber }) => {
           <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.6 }}
+        transition={{ duration: 0.6, delay: 0.6, type: "spring", stiffness: 100 }}
         className="flex gap-2 w-full max-w-md"
       >
         <Input
@@ -250,17 +285,19 @@ const ChessKnightLevel = ({ levelNumber, onComplete, nextLevelNumber }) => {
           value={inputValue}
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}
-          placeholder="Enter move (e.g., /move B3)"
-          className="border-purple-300 dark:border-purple-600/50 bg-white dark:bg-[#1A0F2E]/70 shadow-inner focus:ring-[#F5A623] focus:border-[#F9DC34]"
+          placeholder="Enter command..."
+          className="border-purple-300 dark:border-purple-600/50 bg-white dark:bg-[#1A0F2E]/70 shadow-inner focus:ring-[#F5A623] focus:border-[#F9DC34] transition-all"
         />
-        <button 
+        <motion.button 
           onClick={handleCommandSubmit}
-          className="bg-gradient-to-r from-[#F9DC34] to-[#F5A623] hover:from-[#FFE55C] hover:to-[#FFBD4A] p-2 rounded-lg shadow-md transition-transform hover:scale-105"
+          whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(249, 220, 52, 0.5)" }}
+          whileTap={{ scale: 0.95 }}
+          className="bg-gradient-to-r from-[#F9DC34] to-[#F5A623] hover:from-[#FFE55C] hover:to-[#FFBD4A] p-2 rounded-lg shadow-md transition-transform"
         >
           <div className="w-6 h-6 flex items-center justify-center">
             <ArrowRight className="w-5 h-5 text-purple-900" />
           </div>
-        </button>
+        </motion.button>
       </motion.div>
         </div>
       </div>
@@ -271,7 +308,7 @@ const ChessKnightLevel = ({ levelNumber, onComplete, nextLevelNumber }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm"
+            className="fixed inset-0 z-[70] flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm"
           >
             <motion.div 
               initial={{ scale: 0.9 }}
@@ -320,7 +357,7 @@ const ChessKnightLevel = ({ levelNumber, onComplete, nextLevelNumber }) => {
                 </div>
               </div>
               
-              <div className="bg-purple-50 dark:bg-purple-900/30 px-6 py-4 text-center">
+              <div className="bg-purple-50 dark:bg-purple-900/30 px-6 py-4 text-center flex-shrink-0">
                 <button
                   onClick={() => setHelpModalOpen(false)}
                   className="bg-gradient-to-r from-[#F9DC34] to-[#F5A623] hover:from-[#FFE55C] hover:to-[#FFBD4A] px-6 py-2 rounded-lg text-purple-900 font-medium shadow-md transition-transform hover:scale-105"

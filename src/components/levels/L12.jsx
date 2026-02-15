@@ -133,35 +133,37 @@ const TimekeepersLevel = ({ levelNumber, onComplete, nextLevelNumber }) => {
 
   return (
     <div className="flex flex-col items-center mt-8 max-w-4xl mx-auto px-4">
-      <motion.h1 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="px-6 py-3 text-xl font-bold text-[#2D1B4B] dark:text-[#1A0F2E] bg-gradient-to-r from-[#F9DC34] to-[#F5A623] rounded-full shadow-lg"
-      >
-        Level 12
-      </motion.h1>
+      {/* Level title badge - now in sticky header */}
       
       <motion.p 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2, type: "spring", stiffness: 100 }}
         className="mt-8 text-lg font-semibold mb-4 text-center text-purple-900 dark:text-[#F9DC34]"
       >
         The ancient clock is stuck at 8:46. Reset it to 10:58!
       </motion.p>
 
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
+        initial={{ opacity: 0, scale: 0.9, rotateY: -10 }}
+        animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+        transition={{ duration: 0.7, delay: 0.3, type: "spring", stiffness: 80 }}
         className="bg-white dark:bg-[#2D1B4B]/40 rounded-2xl p-6 shadow-lg backdrop-blur-sm border border-purple-200 dark:border-purple-700/30 w-full max-w-md"
       >
         <div className="min-h-48 flex flex-col items-center justify-center">
-          <Clock className="w-24 h-24 text-purple-700 dark:text-purple-300 mb-4" />
-          <div className="text-4xl font-bold text-purple-800 dark:text-[#F9DC34]">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+          >
+            <Clock className="w-24 h-24 text-purple-700 dark:text-purple-300 mb-4" />
+          </motion.div>
+          <motion.div 
+            className="text-4xl font-bold text-purple-800 dark:text-[#F9DC34]"
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+          >
             {currentTime}
-          </div>
+          </motion.div>
         </div>
       </motion.div>
       
@@ -210,7 +212,7 @@ const TimekeepersLevel = ({ levelNumber, onComplete, nextLevelNumber }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm"
+            className="fixed inset-0 z-[70] flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm"
           >
             <motion.div 
               initial={{ scale: 0.9 }}
@@ -242,7 +244,7 @@ const TimekeepersLevel = ({ levelNumber, onComplete, nextLevelNumber }) => {
                
               </div>
               
-              <div className="bg-purple-50 dark:bg-purple-900/30 px-6 py-4 text-center">
+              <div className="bg-purple-50 dark:bg-purple-900/30 px-6 py-4 text-center flex-shrink-0">
                 <button
                   onClick={() => setHelpModalOpen(false)}
                   className="bg-gradient-to-r from-[#F9DC34] to-[#F5A623] hover:from-[#FFE55C] hover:to-[#FFBD4A] px-6 py-2 rounded-lg text-purple-900 font-medium shadow-md transition-transform hover:scale-105"

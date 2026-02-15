@@ -171,19 +171,12 @@ const Level15 = ({ onComplete }) => {
 
   return (
     <div className="flex flex-col items-center mt-8 max-w-4xl mx-auto px-4">
-      <motion.h1 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="px-6 py-3 text-xl font-bold text-[#2D1B4B] dark:text-[#1A0F2E] bg-gradient-to-r from-[#F9DC34] to-[#F5A623] rounded-full shadow-lg"
-      >
-        Level 15
-      </motion.h1>
+      {/* Level title badge - now in sticky header */}
       
       <motion.p 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2, type: "spring", stiffness: 100 }}
         className="mt-8 text-lg font-semibold mb-4 text-center text-purple-900 dark:text-[#F9DC34]"
       >
         {message}
@@ -195,11 +188,11 @@ const Level15 = ({ onComplete }) => {
         transition={{ duration: 0.6, delay: 0.3 }}
         className="bg-white dark:bg-[#2D1B4B]/40 rounded-2xl p-6 shadow-lg backdrop-blur-sm border border-purple-200 dark:border-purple-700/30 w-full max-w-md"
       >
-        <div className="mb-8 flex gap-2 justify-center">
+        <div className="mb-8 flex gap-1 sm:gap-2 justify-center">
           {targetSequence.map((note, index) => (
             <motion.div
               key={index}
-              className={`w-12 h-32 rounded-b-lg relative ${
+              className={`w-8 h-24 sm:w-12 sm:h-32 rounded-b-lg relative ${
                 playbackIndex === index 
                   ? 'bg-purple-500' 
                   : 'bg-gray-300 dark:bg-gray-700'
@@ -281,7 +274,7 @@ const Level15 = ({ onComplete }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm"
+            className="fixed inset-0 z-[70] flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm"
           >
             <motion.div 
               initial={{ scale: 0.9 }}
@@ -334,7 +327,7 @@ const Level15 = ({ onComplete }) => {
                 </p>
               </div>
               
-              <div className="bg-purple-50 dark:bg-purple-900/30 px-6 py-4 text-center">
+              <div className="bg-purple-50 dark:bg-purple-900/30 px-6 py-4 text-center flex-shrink-0">
                 <button
                   onClick={() => setHelpModalOpen(false)}
                   className="bg-gradient-to-r from-[#F9DC34] to-[#F5A623] hover:from-[#FFE55C] hover:to-[#FFBD4A] px-6 py-2 rounded-lg text-purple-900 font-medium shadow-md transition-transform hover:scale-105"

@@ -53,14 +53,24 @@ export default function Game() {
   if (currentLevelIndex !== null) {
     const CurrentLevel = levels[currentLevelIndex];
     return (
-      <div className="w-screen min-h-screen bg-gradient-to-b from-[#2D1B4B] to-[#1A0F2E]">
-        <div className="sticky top-0 z-50 p-4 bg-gradient-to-b from-[#2D1B4B]/95 to-transparent backdrop-blur-sm border-b border-purple-500/20">
-          <button
-            className="px-5 py-2.5 rounded-lg font-bold text-purple-900 bg-gradient-to-r from-[#F9DC34] to-[#F5A623] hover:from-[#FFE55C] hover:to-[#FFBD4A] transition-all shadow-lg"
-            onClick={() => setCurrentLevelIndex(null)}
-          >
-            ← Back
-          </button>
+      <div className="fixed inset-0 z-[60] bg-gradient-to-b from-[#2D1B4B] to-[#1A0F2E] overflow-y-auto">
+        <div className="sticky top-0 z-50 backdrop-blur-md bg-gradient-to-r from-[#2D1B4B]/90 to-[#3D2060]/90 border-b border-purple-400/20 shadow-lg">
+          <div className="flex items-center justify-between px-4 py-3 max-w-7xl mx-auto">
+            <button
+              className="px-5 py-2.5 rounded-lg font-bold text-purple-900 bg-gradient-to-r from-[#F9DC34] to-[#F5A623] hover:from-[#FFE55C] hover:to-[#FFBD4A] transition-all shadow-lg"
+              onClick={() => setCurrentLevelIndex(null)}
+            >
+              ← Back
+            </button>
+            <h1 className="px-6 py-2 text-xl font-bold text-[#2D1B4B] dark:text-[#1A0F2E] bg-gradient-to-r from-[#F9DC34] to-[#F5A623] rounded-full shadow-lg">
+              Level {currentLevelIndex + 1}
+            </h1>
+            <Link href="/" className="flex items-center">
+              <span className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#F9DC34] to-[#F5A623]">
+                Odyssey
+              </span>
+            </Link>
+          </div>
         </div>
         <CurrentLevel onComplete={handleLevelComplete} />
       </div>
