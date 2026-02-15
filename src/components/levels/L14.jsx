@@ -257,17 +257,20 @@ const CommandSnake = ({ levelNumber, onComplete, nextLevelNumber }) => {
         {renderBoard()}
       </div>
 
-       <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="mx-10 my-6 text-center cursor-pointer text-purple-700 dark:text-purple-300 hover:text-[#F5A623] dark:hover:text-[#F9DC34] transition-colors"
-              onClick={() => setHelpModalOpen(true)}
-            >
-              Type <span className="font-mono bg-purple-100 dark:bg-purple-900/30 px-2 py-1 rounded">/help</span> to get commands and hints
-            </motion.span>
+       {/* Sticky Command Panel */}
+      <div className="sticky bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-[#1A0F2E] via-[#1A0F2E]/95 to-transparent backdrop-blur-sm border-t border-purple-500/20 py-4 mt-8">
+        <div className="flex flex-col items-center gap-3 max-w-4xl mx-auto px-4">
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="text-sm text-center cursor-pointer text-purple-700 dark:text-purple-300 hover:text-[#F5A623] dark:hover:text-[#F9DC34] transition-colors"
+            onClick={() => setHelpModalOpen(true)}
+          >
+            Type <span className="font-mono bg-purple-100 dark:bg-purple-900/30 px-2 py-1 rounded">/help</span> to get commands and hints
+          </motion.span>
 
-      <motion.div 
+          <motion.div 
         className="flex gap-2 w-full max-w-md mt-2 sm:mt-4"
       >
         <Input

@@ -54,7 +54,7 @@ export default function Game() {
     const CurrentLevel = levels[currentLevelIndex];
     return (
       <div className="w-screen min-h-screen bg-gradient-to-b from-[#2D1B4B] to-[#1A0F2E]">
-        <div className="sticky top-0 z-50 p-4 bg-gradient-to-b from-[#2D1B4B]/95 to-transparent backdrop-blur-sm">
+        <div className="sticky top-0 z-50 p-4 bg-gradient-to-b from-[#2D1B4B]/95 to-transparent backdrop-blur-sm border-b border-purple-500/20">
           <button
             className="px-5 py-2.5 rounded-lg font-bold text-purple-900 bg-gradient-to-r from-[#F9DC34] to-[#F5A623] hover:from-[#FFE55C] hover:to-[#FFBD4A] transition-all shadow-lg"
             onClick={() => setCurrentLevelIndex(null)}
