@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import { useToast } from "../ui/use-toast";
 import { useCommandHistory } from "@/hooks/useCommandHistory";
+import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
+import { useTheme } from "next-themes";
 
 const PASSWORD = "unlock";
 const MAX_BRIGHTNESS = 5;
@@ -18,6 +20,7 @@ const Level14 = ({ onComplete }) => {
   const [brightness, setBrightness] = useState(0); // 0 = black, 5 = full
   const [hasLooked, setHasLooked] = useState(false);
   const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     if (isSuccess) {
@@ -151,6 +154,15 @@ const Level14 = ({ onComplete }) => {
 
   return (
     <div className="flex flex-col items-center mt-8 max-w-4xl mx-auto px-4">
+      {/* Theme Toggle Button */}
+      <button
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        className="fixed top-4 right-4 z-50 p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30 hover:bg-purple-200 dark:hover:bg-purple-800/50 transition-colors border border-purple-300 dark:border-purple-600"
+        aria-label="Toggle theme"
+      >
+        <SunIcon className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-purple-700" />
+        <MoonIcon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-purple-300 top-2 left-2" />
+      </button>
       {/* Level title badge - now in sticky header */}
 
       {/* Question */}

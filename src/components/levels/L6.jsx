@@ -5,8 +5,8 @@ import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import { useToast } from "../ui/use-toast";
-import { useCommandHistory } from "@/hooks/useCommandHistory";
-
+import { useCommandHistory } from "@/hooks/useCommandHistory";import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
+import { useTheme } from "next-themes";
 const generateRandomBits = () => {
   return Array.from({ length: 7 }, () => (Math.random() > 0.5 ? 1 : 0));
 };
@@ -19,6 +19,7 @@ const Level6 = ({ onComplete }) => {
   const [attempts, setAttempts] = useState([]);
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
 
   const correctNumber = useMemo(() => {
     return parseInt(bits.join(""), 2);
@@ -117,6 +118,15 @@ const Level6 = ({ onComplete }) => {
 
   return (
     <div className="flex flex-col items-center mt-8 max-w-4xl mx-auto px-4">
+      {/* Theme Toggle Button */}
+      <button
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        className="fixed top-4 right-4 z-50 p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30 hover:bg-purple-200 dark:hover:bg-purple-800/50 transition-colors border border-purple-300 dark:border-purple-600"
+        aria-label="Toggle theme"
+      >
+        <SunIcon className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-purple-700" />
+        <MoonIcon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-purple-300 top-2 left-2" />
+      </button>
       {/* Level title badge - now in sticky header */}
 
       <motion.p
