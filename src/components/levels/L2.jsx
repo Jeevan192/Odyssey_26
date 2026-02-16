@@ -198,7 +198,6 @@ const Level2 = ({ onComplete }) => {
           <motion.path
             initial={{ d: "M185,155 Q175,125 170,100" }}
             animate={stemControls}
-            d="M185,155 Q185,125 185,95"
             stroke="#4CAF50"
             strokeWidth="3"
             strokeLinecap="round"
