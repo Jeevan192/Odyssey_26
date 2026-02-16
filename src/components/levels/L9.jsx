@@ -175,15 +175,6 @@ const Level9 = ({ onComplete }) => {
 
   return (
     <div className="flex flex-col items-center mt-8 max-w-4xl mx-auto px-4">
-      {/* Theme Toggle Button */}
-      <button
-        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        className="fixed top-4 right-4 z-50 p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30 hover:bg-purple-200 dark:hover:bg-purple-800/50 transition-colors border border-purple-300 dark:border-purple-600"
-        aria-label="Toggle theme"
-      >
-        <SunIcon className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-purple-700" />
-        <MoonIcon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-purple-300 top-2 left-2" />
-      </button>
       {/* Level title badge - now in sticky header */}
 
       {/* Question */}
@@ -258,7 +249,7 @@ const Level9 = ({ onComplete }) => {
 
       {/* Help prompt */}
       {/* Sticky Command Panel */}
-      <div className="sticky bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-[#1A0F2E] via-[#1A0F2E]/95 to-transparent backdrop-blur-sm border-t border-purple-500/20 py-4 mt-8">
+      <div className="sticky bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-purple-50/95 via-purple-50/90 to-transparent dark:from-[#1A0F2E] dark:via-[#1A0F2E]/95 dark:to-transparent backdrop-blur-sm border-t border-purple-300/30 dark:border-purple-500/20 py-4 mt-8">
         <div className="flex flex-col items-center gap-3 max-w-4xl mx-auto px-4">
           <motion.span
             initial={{ opacity: 0 }}
@@ -318,6 +309,16 @@ const Level9 = ({ onComplete }) => {
                 Available Commands:
               </h2>
               <div className="space-y-1 mb-6">
+                <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg border-l-4 border-[#F5A623]">
+                  <span className="font-bold text-purple-700 dark:text-purple-300">
+                    /theme
+                  </span>{" "}
+                  <span className="text-blue-600 dark:text-blue-300">[dark/light]</span>
+                  <p className="mt-1 text-gray-600 dark:text-gray-300">
+                    Switch between dark and light themes.
+                  </p>
+                </div>
+
                 <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg border-l-4 border-[#F5A623]">
                   <span className="font-bold text-purple-700 dark:text-purple-300">
                     /enter
