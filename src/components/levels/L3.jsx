@@ -396,9 +396,8 @@ const Level3 = ({ onComplete }) => {
             animate={{ rotate: mirrorRotation }}
             transition={{ type: "spring", stiffness: 150, damping: 20 }}
             style={{
-              originX: `${MIRROR_CX}px`,
-              originY: `${MIRROR_CY}px`,
-              transformOrigin: `${MIRROR_CX}px ${MIRROR_CY}px`,
+              originX: 0.5,
+              originY: 0.5,
             }}
           >
             {/* Mirror surface (reflective) */}
