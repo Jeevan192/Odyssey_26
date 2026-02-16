@@ -7,6 +7,7 @@ import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import { useToast } from "../ui/use-toast";
 import { useCommandHistory } from "@/hooks/useCommandHistory";
 import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
+import { useTheme } from "next-themes";
 
 // Flower types positioned across the garden
 const FLOWERS = [
@@ -27,6 +28,7 @@ const Level2 = ({ onComplete }) => {
   const [sunAnimating, setSunAnimating] = useState(false);
   const [themeCommandVisible, setThemeCommandVisible] = useState(false);
   const { toast } = useToast();
+  const { setTheme } = useTheme();
   const sunControls = useAnimation();
   const sunflowerControls = useAnimation();
   const petalControls = useAnimation();
@@ -58,6 +60,9 @@ const Level2 = ({ onComplete }) => {
     if (sunAnimating) return;
     setSunAnimating(true);
     setHasObserved(true);
+
+    // Change the global website theme
+    setTheme(mode);
 
     if (mode === "dark") {
       setIsDarkScene(true);
