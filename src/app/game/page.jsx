@@ -61,8 +61,8 @@ export default function Game() {
   if (currentLevelIndex !== null) {
     const CurrentLevel = levels[currentLevelIndex];
     return (
-      <div className="fixed inset-0 z-[60] bg-gradient-to-b from-[#2D1B4B] to-[#1A0F2E] overflow-y-auto">
-        <div className="sticky top-0 z-50 backdrop-blur-md bg-gradient-to-r from-[#2D1B4B]/90 to-[#3D2060]/90 border-b border-purple-400/20 shadow-lg">
+      <div className="fixed inset-0 z-[60] bg-white dark:bg-gradient-to-b dark:from-[#2D1B4B] dark:to-[#1A0F2E] overflow-y-auto">
+        <div className="sticky top-0 z-50 backdrop-blur-md bg-purple-50/90 dark:bg-gradient-to-r dark:from-[#2D1B4B]/90 dark:to-[#3D2060]/90 border-b border-purple-400/20 shadow-lg">
           <div className="flex items-center justify-between px-3 sm:px-4 py-3 max-w-7xl mx-auto">
             <button
               className="px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg font-bold text-purple-900 bg-gradient-to-r from-[#F9DC34] to-[#F5A623] hover:from-[#FFE55C] hover:to-[#FFBD4A] transition-all shadow-lg text-sm sm:text-base"
@@ -116,18 +116,20 @@ export default function Game() {
 
   // Level selection grid
   return (
-    <div className="w-screen min-h-screen bg-gradient-to-b from-[#2D1B4B] to-[#1A0F2E] flex flex-col items-center relative overflow-hidden">
+    <div className="w-screen min-h-screen bg-white dark:bg-gradient-to-b dark:from-[#2D1B4B] dark:to-[#1A0F2E] flex flex-col items-center relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute w-full h-full opacity-10">
+        <div className="absolute w-full h-full opacity-10 dark:opacity-10">
           <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
             <path
               d="M0,25 C20,10 50,40 80,5 L100,25 L100,100 L0,100 Z"
               fill="rgba(237, 139, 255, 0.4)"
+              className="dark:fill-[rgba(237,139,255,0.4)]"
             />
             <path
               d="M0,50 C30,35 70,65 100,40 L100,100 L0,100 Z"
               fill="rgba(138, 43, 226, 0.3)"
+              className="dark:fill-[rgba(138,43,226,0.3)]"
             />
           </svg>
         </div>
@@ -147,12 +149,12 @@ export default function Game() {
         <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#F9DC34] to-[#F5A623]">
           The Odyssey
         </h1>
-        <p className="text-purple-200/80 mt-2 text-base">Select a level to play</p>
+        <p className="text-purple-600 dark:text-purple-200/80 mt-2 text-base">Select a level to play</p>
       </div>
 
       {/* Level grid */}
       <div className="w-full max-w-2xl px-6 z-10">
-        <div className="backdrop-blur-md bg-white/5 rounded-2xl p-5 border border-purple-300/20 shadow-xl">
+        <div className="backdrop-blur-md bg-purple-100/80 dark:bg-white/5 rounded-2xl p-5 border border-purple-300/40 dark:border-purple-300/20 shadow-xl">
           <div className="grid grid-cols-6 gap-2.5">
             {levels.map((_, index) => (
               <button
@@ -163,7 +165,7 @@ export default function Game() {
                   transition-all duration-200 cursor-pointer border-2
                   ${selectedLevel === index
                     ? "bg-gradient-to-br from-[#F9DC34] to-[#F5A623] text-purple-900 border-[#F9DC34] shadow-lg shadow-yellow-500/30 scale-105"
-                    : "bg-purple-700/60 text-[#F9DC34] border-purple-500/40 hover:bg-purple-600/70 hover:border-purple-400/60 hover:scale-105"
+                    : "bg-purple-400/80 dark:bg-purple-700/60 text-purple-900 dark:text-[#F9DC34] border-purple-400 dark:border-purple-500/40 hover:bg-purple-500/90 dark:hover:bg-purple-600/70 hover:border-purple-500 dark:hover:border-purple-400/60 hover:scale-105"
                   }
                 `}
               >
@@ -176,11 +178,11 @@ export default function Game() {
 
       {/* Level detail panel */}
       <div className="w-full max-w-2xl px-6 mt-5 z-10">
-        <div className="backdrop-blur-md bg-white/5 rounded-2xl p-6 border border-purple-300/20 shadow-xl text-center">
+        <div className="backdrop-blur-md bg-purple-100/80 dark:bg-white/5 rounded-2xl p-6 border border-purple-300/40 dark:border-purple-300/20 shadow-xl text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-[#F9DC34] mb-1">
             Level {selectedLevel + 1}
           </h2>
-          <p className="text-purple-200/70 text-sm mb-5">
+          <p className="text-purple-600 dark:text-purple-200/70 text-sm mb-5">
             The Odyssey – Level {selectedLevel + 1} of {levels.length}
           </p>
           <button
@@ -200,8 +202,8 @@ export default function Game() {
           className={`
             py-3 rounded-xl font-bold text-base transition-all border-2
             ${selectedLevel === 0
-              ? "bg-purple-900/30 text-purple-400/40 border-purple-700/30 cursor-not-allowed"
-              : "bg-purple-700/50 text-purple-100 border-purple-500/40 hover:bg-purple-600/60 hover:border-purple-400/50 cursor-pointer"
+              ? "bg-purple-200/50 dark:bg-purple-900/30 text-purple-400 dark:text-purple-400/40 border-purple-300 dark:border-purple-700/30 cursor-not-allowed"
+              : "bg-purple-400/80 dark:bg-purple-700/50 text-purple-900 dark:text-purple-100 border-purple-400 dark:border-purple-500/40 hover:bg-purple-500/90 dark:hover:bg-purple-600/60 hover:border-purple-500 dark:hover:border-purple-400/50 cursor-pointer"
             }
           `}
         >
@@ -213,8 +215,8 @@ export default function Game() {
           className={`
             py-3 rounded-xl font-bold text-base transition-all border-2
             ${selectedLevel === levels.length - 1
-              ? "bg-purple-900/30 text-purple-400/40 border-purple-700/30 cursor-not-allowed"
-              : "bg-purple-700/50 text-purple-100 border-purple-500/40 hover:bg-purple-600/60 hover:border-purple-400/50 cursor-pointer"
+              ? "bg-purple-200/50 dark:bg-purple-900/30 text-purple-400 dark:text-purple-400/40 border-purple-300 dark:border-purple-700/30 cursor-not-allowed"
+              : "bg-purple-400/80 dark:bg-purple-700/50 text-purple-900 dark:text-purple-100 border-purple-400 dark:border-purple-500/40 hover:bg-purple-500/90 dark:hover:bg-purple-600/60 hover:border-purple-500 dark:hover:border-purple-400/50 cursor-pointer"
             }
           `}
         >
