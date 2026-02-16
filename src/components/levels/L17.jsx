@@ -393,10 +393,10 @@ const Level17 = ({ onComplete }) => {
 
                                 <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg border-l-4 border-[#F5A623]">
                                     <span className="font-bold text-purple-700 dark:text-purple-300">
-                                        /pause
+                                        /stop
                                     </span>
                                     <p className="mt-1 text-gray-600 dark:text-gray-300">
-                                        Pause the track.
+                                        Stop the track.
                                     </p>
                                 </div>
 
