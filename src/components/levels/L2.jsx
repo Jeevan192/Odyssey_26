@@ -196,6 +196,7 @@ const Level2 = ({ onComplete }) => {
         {/* Stem */}
         {isSunflower ? (
           <motion.path
+            initial={{ d: "M185,155 Q175,125 170,100" }}
             animate={stemControls}
             d="M185,155 Q185,125 185,95"
             stroke="#4CAF50"
@@ -235,11 +236,13 @@ const Level2 = ({ onComplete }) => {
         {/* Flower head */}
         {isSunflower ? (
           <motion.g
+            initial={{ rotate: 45 }}
             animate={sunflowerControls}
             style={{ originX: `${flower.x}px`, originY: `${groundY - stemHeight}px` }}
           >
             {/* Sunflower petals — animate scale to close/open */}
             <motion.g
+              initial={{ scale: 0.2 }}
               animate={petalControls}
               style={{ originX: `${flower.x}px`, originY: `${groundY - stemHeight}px` }}
             >
@@ -376,7 +379,7 @@ const Level2 = ({ onComplete }) => {
           {/* Sky gradient is handled by the container div */}
 
           {/* Sun */}
-          <motion.g animate={sunControls}>
+          <motion.g initial={{ y: 160, opacity: 0 }} animate={sunControls}>
             {/* Sun glow */}
             <circle cx="40" cy="40" r="30" fill="#FFF9C4" opacity="0.4" />
             {/* Sun body */}
