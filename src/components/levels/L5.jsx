@@ -161,6 +161,7 @@ const Level5 = ({ onComplete }) => {
     pushCommand(inputValue);
     const cmd = inputValue.trim().toLowerCase();
 
+    const themeMatch = cmd.match(/^\/theme\s+(dark|light)$/i);
     const crossWithMatch = cmd.match(
       /^\/cross\s+with\s+(wolf|goat|sheep|cabbage)$/i
     );
@@ -168,7 +169,14 @@ const Level5 = ({ onComplete }) => {
     const resetMatch = cmd.match(/^\/reset$/i);
     const helpMatch = cmd.match(/^\/help$/i);
 
-    if (isFailed && !resetMatch && !helpMatch) {
+    if (themeMatch) {
+      setTheme(themeMatch[1].toLowerCase());
+      toast({
+        title: themeMatch[1].toLowerCase() === "dark" ? "🌙 Theme Changed" : "☀️ Theme Changed",
+        description: `Switched to ${themeMatch[1].toLowerCase()} mode`,
+        variant: "default"
+      });
+    } else if (isFailed && !resetMatch && !helpMatch) {
       toast({
         title: "Game Over",
         description: "Use /reset to try again.",

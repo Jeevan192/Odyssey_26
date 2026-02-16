@@ -82,10 +82,22 @@ const Level8 = ({ onComplete }) => {
     pushCommand(inputValue);
     const cmd = inputValue.trim();
 
+    const themeMatch = cmd.match(/^\/theme\s+(dark|light)$/i);
     const weighMatch = cmd.match(/^\/weigh\s+(.+?)\s+(?:vs\s+)?(.+)$/i);
     const guessMatch = cmd.match(/^\/guess\s+(\d+)$/i);
     const resetMatch = cmd.match(/^\/reset$/i);
     const helpMatch = cmd.match(/^\/help$/i);
+
+    if (themeMatch) {
+      setTheme(themeMatch[1].toLowerCase());
+      toast({
+        title: themeMatch[1].toLowerCase() === "dark" ? "🌙 Theme Changed" : "☀️ Theme Changed",
+        description: `Switched to ${themeMatch[1].toLowerCase()} mode`,
+        variant: "default"
+      });
+      setInputValue("");
+      return;
+    }
 
     if (isFailed && !resetMatch && !helpMatch) {
       toast({

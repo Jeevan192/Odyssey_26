@@ -48,11 +48,19 @@ const Level12 = ({ onComplete }) => {
     pushCommand(inputValue);
     const cmd = inputValue.trim();
 
+    const themeMatch = cmd.match(/^\/theme\s+(dark|light)$/i);
     const enterMatch = cmd.match(/^\/enter\s+(.+)$/i);
     const resetMatch = cmd.match(/^\/reset$/i);
     const helpMatch = cmd.match(/^\/help$/i);
 
-    if (enterMatch) {
+    if (themeMatch) {
+      setTheme(themeMatch[1].toLowerCase());
+      toast({
+        title: themeMatch[1].toLowerCase() === "dark" ? "🌙 Theme Changed" : "☀️ Theme Changed",
+        description: `Switched to ${themeMatch[1].toLowerCase()} mode`,
+        variant: "default"
+      });
+    } else if (enterMatch) {
       const pin = enterMatch[1].trim();
 
       if (!/^\d{4}$/.test(pin)) {

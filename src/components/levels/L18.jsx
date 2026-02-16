@@ -48,13 +48,21 @@ const Level18 = ({ onComplete }) => {
         pushCommand(inputValue);
         const cmd = inputValue.trim().toLowerCase();
 
+        const themeMatch = cmd.match(/^\/theme\s+(dark|light)$/i);
         const locateMatch = cmd.match(/^\/locate\s+([\d.\-]+)\s+([\d.\-]+)$/i);
         const submitMatch = cmd.match(/^\/submit\s+(.+)$/i);
         const hintMatch = cmd.match(/^\/hint$/i);
         const resetMatch = cmd.match(/^\/reset$/i);
         const helpMatch = cmd.match(/^\/help$/i);
 
-        if (locateMatch) {
+        if (themeMatch) {
+            setTheme(themeMatch[1].toLowerCase());
+            toast({
+                title: themeMatch[1].toLowerCase() === "dark" ? "🌙 Theme Changed" : "☀️ Theme Changed",
+                description: `Switched to ${themeMatch[1].toLowerCase()} mode`,
+                variant: "default"
+            });
+        } else if (locateMatch) {
             const lat = parseFloat(locateMatch[1]);
             const lon = parseFloat(locateMatch[2]);
             // Accept if within ~0.01 degree of the Hollywood Sign coordinates

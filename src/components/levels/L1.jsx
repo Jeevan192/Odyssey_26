@@ -114,11 +114,19 @@ const Level1 = ({ levelNumber = 1, onComplete, nextLevelNumber = 2 }) => {
     pushCommand(inputValue);
     const cmd = inputValue.trim().toLowerCase();
 
+    const themeMatch = cmd.match(/^\/theme\s+(dark|light)$/i);
     const rotateMatch = cmd.match(/^\/rotate\s+(lighta|lightb|lightc)\s+(left|right)$/i);
     const resetMatch = cmd.match(/^\/reset$/i);
     const helpMatch = cmd.match(/^\/help$/i);
 
-    if (rotateMatch) {
+    if (themeMatch) {
+      setTheme(themeMatch[1].toLowerCase());
+      toast({
+        title: themeMatch[1].toLowerCase() === "dark" ? "🌙 Theme Changed" : "☀️ Theme Changed",
+        description: `Switched to ${themeMatch[1].toLowerCase()} mode`,
+        variant: "default"
+      });
+    } else if (rotateMatch) {
       const lightKey = rotateMatch[1].charAt(rotateMatch[1].length - 1).toUpperCase();
       const dir = rotateMatch[2].toLowerCase();
       const def = LIGHT_DEFS[lightKey];

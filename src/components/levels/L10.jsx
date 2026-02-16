@@ -95,11 +95,19 @@ const Level10 = ({ onComplete }) => {
     pushCommand(inputValue);
     const cmd = inputValue.trim().toLowerCase();
 
+    const themeMatch = cmd.match(/^\/theme\s+(dark|light)$/i);
     const swapMatch = cmd.match(/^\/swap\s+(\S+)\s+(\S+)$/i);
     const resetMatch = cmd.match(/^\/reset$/i);
     const helpMatch = cmd.match(/^\/help$/i);
 
-    if (swapMatch) {
+    if (themeMatch) {
+      setTheme(themeMatch[1].toLowerCase());
+      toast({
+        title: themeMatch[1].toLowerCase() === "dark" ? "🌙 Theme Changed" : "☀️ Theme Changed",
+        description: `Switched to ${themeMatch[1].toLowerCase()} mode`,
+        variant: "default"
+      });
+    } else if (swapMatch) {
       const pos1 = parsePos(swapMatch[1]);
       const pos2 = parsePos(swapMatch[2]);
 

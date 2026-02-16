@@ -65,13 +65,21 @@ const Level7 = ({ onComplete }) => {
     pushCommand(inputValue);
     const cmd = inputValue.trim().toLowerCase();
 
+    const themeMatch = cmd.match(/^\/theme\s+(dark|light)$/i);
     const fillMatch = cmd.match(/^\/fill\s+(.+)$/i);
     const emptyMatch = cmd.match(/^\/empty\s+(.+)$/i);
     const pourMatch = cmd.match(/^\/pour\s+(\S+)\s+(\S+)$/i);
     const resetMatch = cmd.match(/^\/reset$/i);
     const helpMatch = cmd.match(/^\/help$/i);
 
-    if (fillMatch) {
+    if (themeMatch) {
+      setTheme(themeMatch[1].toLowerCase());
+      toast({
+        title: themeMatch[1].toLowerCase() === "dark" ? "🌙 Theme Changed" : "☀️ Theme Changed",
+        description: `Switched to ${themeMatch[1].toLowerCase()} mode`,
+        variant: "default"
+      });
+    } else if (fillMatch) {
       const jug = parseJug(fillMatch[1]);
       if (jug === 5) {
         setJug5(JUG_5_MAX);

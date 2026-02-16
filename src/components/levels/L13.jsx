@@ -67,13 +67,23 @@ const Level13 = ({ onComplete }) => {
     pushCommand(inputValue);
     const cmd = inputValue.trim();
 
+    const themeMatch = cmd.match(/^\/theme\s+(dark|light)$/i);
     const loginMatch = cmd.match(/^\/login$/i);
     const openSettingsMatch = cmd.match(/^\/open\s+settings$/i);
     const setTimeMatch = cmd.match(/^\/set\s+time\s+(\d{1,2}):(\d{2})$/i);
     const resetMatch = cmd.match(/^\/reset$/i);
     const helpMatch = cmd.match(/^\/help$/i);
 
-    if (loginMatch) {
+    if (themeMatch) {
+      setTheme(themeMatch[1].toLowerCase());
+      addLine(`> /theme ${themeMatch[1]}`, "#A78BFA");
+      addLine(`✓ Theme set to ${themeMatch[1].toLowerCase()} mode`, "#4ADE80");
+      toast({
+        title: themeMatch[1].toLowerCase() === "dark" ? "🌙 Theme Changed" : "☀️ Theme Changed",
+        description: `Switched to ${themeMatch[1].toLowerCase()} mode`,
+        variant: "default"
+      });
+    } else if (loginMatch) {
       addLine(`> /login`, "#A78BFA");
       if (isWorkingHours(currentHour)) {
         addLine("✓ ACCESS GRANTED", "#22c55e");

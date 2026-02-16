@@ -51,6 +51,7 @@ const Level15 = ({ onComplete }) => {
     pushCommand(inputValue);
     const cmd = inputValue.trim().toLowerCase();
 
+    const themeMatch = cmd.match(/^\/theme\s+(dark|light)$/i);
     const pressMatch = cmd.match(/^\/press\s+(\d)$/i);
     const toggleMatch = cmd.match(/^\/toggle\s+numlock$/i);
     const submitMatch = cmd.match(/^\/submit$/i);
@@ -58,7 +59,14 @@ const Level15 = ({ onComplete }) => {
     const resetMatch = cmd.match(/^\/reset$/i);
     const helpMatch = cmd.match(/^\/help$/i);
 
-    if (pressMatch) {
+    if (themeMatch) {
+      setTheme(themeMatch[1].toLowerCase());
+      toast({
+        title: themeMatch[1].toLowerCase() === "dark" ? "🌙 Theme Changed" : "☀️ Theme Changed",
+        description: `Switched to ${themeMatch[1].toLowerCase()} mode`,
+        variant: "default"
+      });
+    } else if (pressMatch) {
       const digit = pressMatch[1];
       if (!numLock) {
         toast({

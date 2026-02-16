@@ -49,6 +49,7 @@ const Level14 = ({ onComplete }) => {
     pushCommand(inputValue);
     const cmd = inputValue.trim().toLowerCase();
 
+    const themeMatch = cmd.match(/^\/theme\s+(dark|light)$/i);
     const increaseBright = cmd.match(/^\/increase\s+brightness$/i);
     const decreaseBright = cmd.match(/^\/decrease\s+brightness$/i);
     const lookMatch = cmd.match(/^\/look$/i);
@@ -56,7 +57,14 @@ const Level14 = ({ onComplete }) => {
     const resetMatch = cmd.match(/^\/reset$/i);
     const helpMatch = cmd.match(/^\/help$/i);
 
-    if (increaseBright) {
+    if (themeMatch) {
+      setTheme(themeMatch[1].toLowerCase());
+      toast({
+        title: themeMatch[1].toLowerCase() === "dark" ? "🌙 Theme Changed" : "☀️ Theme Changed",
+        description: `Switched to ${themeMatch[1].toLowerCase()} mode`,
+        variant: "default"
+      });
+    } else if (increaseBright) {
       if (brightness >= MAX_BRIGHTNESS) {
         toast({
           title: "Max brightness!",

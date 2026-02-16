@@ -61,13 +61,21 @@ const Level11 = ({ onComplete }) => {
     pushCommand(inputValue);
     const cmd = inputValue.trim().toLowerCase();
 
+    const themeMatch = cmd.match(/^\/theme\s+(dark|light)$/i);
     const turnMatch = cmd.match(/^\/turn\s+fan\s+(left|right)$/i);
     const powerMatch = cmd.match(/^\/power\s+(on|off)$/i);
     const enterMatch = cmd.match(/^\/enter\s+(.+)$/i);
     const resetMatch = cmd.match(/^\/reset$/i);
     const helpMatch = cmd.match(/^\/help$/i);
 
-    if (turnMatch) {
+    if (themeMatch) {
+      setTheme(themeMatch[1].toLowerCase());
+      toast({
+        title: themeMatch[1].toLowerCase() === "dark" ? "🌙 Theme Changed" : "☀️ Theme Changed",
+        description: `Switched to ${themeMatch[1].toLowerCase()} mode`,
+        variant: "default"
+      });
+    } else if (turnMatch) {
       const dir = turnMatch[1].toLowerCase();
       if (fanOn) {
         toast({

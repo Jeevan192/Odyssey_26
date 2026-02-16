@@ -82,6 +82,7 @@ const Level17 = ({ onComplete }) => {
         pushCommand(inputValue);
         const cmd = inputValue.trim().toLowerCase();
 
+        const themeMatch = cmd.match(/^\/theme\s+(dark|light)$/i);
         const playMatch = cmd.match(/^\/play$/i);
         const stopMatch = cmd.match(/^\/stop$/i);
         const viewMatch = cmd.match(/^\/view\s+details$/i);
@@ -89,7 +90,14 @@ const Level17 = ({ onComplete }) => {
         const resetMatch = cmd.match(/^\/reset$/i);
         const helpMatch = cmd.match(/^\/help$/i);
 
-        if (playMatch) {
+        if (themeMatch) {
+            setTheme(themeMatch[1].toLowerCase());
+            toast({
+                title: themeMatch[1].toLowerCase() === "dark" ? "🌙 Theme Changed" : "☀️ Theme Changed",
+                description: `Switched to ${themeMatch[1].toLowerCase()} mode`,
+                variant: "default"
+            });
+        } else if (playMatch) {
             if (isPlaying) {
                 toast({
                     title: "Already playing 🎶",
