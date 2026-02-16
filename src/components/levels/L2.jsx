@@ -157,12 +157,12 @@ const Level2 = ({ onComplete }) => {
       }
     } else if (resetMatch) {
       setHasObserved(false);
-      setIsDarkScene(false);
+      setIsDarkScene(true);
       setThemeCommandVisible(false);
-      sunControls.start({ y: 0, opacity: 1, transition: { duration: 0 } });
-      sunflowerControls.start({ rotate: 0, transition: { duration: 0 } });
-      petalControls.start({ scale: 1, transition: { duration: 0 } });
-      stemControls.start({ d: "M185,155 Q185,125 185,95", transition: { duration: 0 } });
+      sunControls.start({ y: 160, opacity: 0, transition: { duration: 0 } });
+      sunflowerControls.start({ rotate: 45, transition: { duration: 0 } });
+      petalControls.start({ scale: 0.2, transition: { duration: 0 } });
+      stemControls.start({ d: "M185,155 Q175,125 170,100", transition: { duration: 0 } });
       toast({
         title: "Level Reset",
         description: "The garden has been reset.",
