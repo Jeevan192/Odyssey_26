@@ -68,23 +68,8 @@ const Home = () => {
   }, [session]);
   
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gradient-to-b from-[#2D1B4B] to-[#1A0F2E] overflow-hidden relative">
+    <div className="min-h-screen flex flex-col items-center bg-transparent overflow-hidden relative">
 
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute w-full h-full opacity-10">
-          <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <path
-              d="M0,25 C20,10 50,40 80,5 L100,25 L100,100 L0,100 Z"
-              fill="rgba(237, 139, 255, 0.4)"
-            />
-            <path
-              d="M0,50 C30,35 70,65 100,40 L100,100 L0,100 Z"
-              fill="rgba(138, 43, 226, 0.3)"
-            />
-          </svg>
-        </div>
-      </div>
-      
       <div className="z-10 w-full max-w-md px-6 py-12 flex flex-col items-center">
         <motion.div 
           initial={{ y: -20, opacity: 0 }}
@@ -112,7 +97,7 @@ const Home = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="w-full flex flex-col items-center"
           >
-            <div className="backdrop-blur-md bg-white/5 rounded-xl p-6 shadow-lg border border-purple-300/20 w-full">
+            <div className="backdrop-blur-md bg-purple-100/80 dark:bg-white/5 rounded-xl p-6 shadow-lg border border-purple-300/40 dark:border-purple-300/20 w-full">
               {userDet?.CL <= staticData.maxLevel ? (
                 <Link href="/game" className="w-full flex justify-center">
                   <Button 
@@ -132,18 +117,18 @@ const Home = () => {
               )}
               
               <div className="mt-8 space-y-4">
-                <div className="flex justify-between items-center p-3 bg-purple-900/40 rounded-lg">
-                  <span className="text-purple-100">Levels completed</span>
+                <div className="flex justify-between items-center p-3 bg-purple-300/60 dark:bg-purple-900/40 rounded-lg">
+                  <span className="text-purple-800 dark:text-purple-100">Levels completed</span>
                   <span className="text-[#F9DC34] font-bold text-xl">{(userDet?.CL || 1) - 1}</span>
                 </div>
                 
-                <div className="flex justify-between items-center p-3 bg-purple-900/40 rounded-lg">
-                  <span className="text-purple-100">Levels available</span>
+                <div className="flex justify-between items-center p-3 bg-purple-300/60 dark:bg-purple-900/40 rounded-lg">
+                  <span className="text-purple-800 dark:text-purple-100">Levels available</span>
                   <span className="text-[#F9DC34] font-bold text-xl">{staticData.maxLevel}</span>
                 </div>
                 
-                <div className="flex justify-between items-center p-3 bg-purple-900/40 rounded-lg">
-                  <span className="text-purple-100">Score</span>
+                <div className="flex justify-between items-center p-3 bg-purple-300/60 dark:bg-purple-900/40 rounded-lg">
+                  <span className="text-purple-800 dark:text-purple-100">Score</span>
                   <span className="text-[#F9DC34] font-bold text-xl">{Math.floor(parseFloat(userDet?.S || 0))}</span>
                 </div>
               </div>
@@ -154,10 +139,10 @@ const Home = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4 }}
-            className="backdrop-blur-md bg-white/5 rounded-xl p-6 shadow-lg border border-purple-300/20 w-full text-center"
+            className="backdrop-blur-md bg-purple-100/80 dark:bg-white/5 rounded-xl p-6 shadow-lg border border-purple-300/40 dark:border-purple-300/20 w-full text-center"
           >
-            <div className="inline-block mb-4 w-12 h-12 rounded-full border-4 border-t-[#F9DC34] border-purple-700 animate-spin"></div>
-            <p className="text-purple-100 text-lg">Connecting to The Odyssey...</p>
+            <div className="inline-block mb-4 w-12 h-12 rounded-full border-4 border-t-[#F9DC34] border-purple-700 dark:border-purple-700 animate-spin"></div>
+            <p className="text-purple-700 dark:text-purple-100 text-lg">Connecting to The Odyssey...</p>
           </motion.div>
         )}
       </div>
