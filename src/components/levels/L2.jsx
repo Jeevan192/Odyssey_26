@@ -26,9 +26,8 @@ const Level2 = ({ onComplete }) => {
   const [hasObserved, setHasObserved] = useState(false);
   const [isDarkScene, setIsDarkScene] = useState(true);
   const [sunAnimating, setSunAnimating] = useState(false);
-  const [themeCommandVisible, setThemeCommandVisible] = useState(false);
   const { toast } = useToast();
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const sunControls = useAnimation();
   const sunflowerControls = useAnimation();
   const petalControls = useAnimation();
@@ -58,6 +57,13 @@ const Level2 = ({ onComplete }) => {
 
   const handleThemeChange = async (mode) => {
     if (sunAnimating) return;
+    
+    // Prevent animation if already in the target theme
+    if ((mode === "dark" && isDarkScene) || (mode === "light" && !isDarkScene)) {
+      setSunAnimating(false);
+      return;
+    }
+    
     setSunAnimating(true);
     setHasObserved(true);
 
@@ -163,7 +169,6 @@ const Level2 = ({ onComplete }) => {
     } else if (resetMatch) {
       setHasObserved(false);
       setIsDarkScene(true);
-      setThemeCommandVisible(false);
       sunControls.start({ y: 160, opacity: 0, transition: { duration: 0 } });
       sunflowerControls.start({ rotate: 45, transition: { duration: 0 } });
       petalControls.start({ scale: 0.2, transition: { duration: 0 } });
@@ -340,20 +345,11 @@ const Level2 = ({ onComplete }) => {
 
   return (
     <div className="flex flex-col items-center mt-8 max-w-4xl mx-auto px-4">
-      {/* Theme Toggle Button - Enables Theme Command Visibility */}
+      {/* Theme Toggle Button */}
       <button
-        onClick={() => {
-          if (!themeCommandVisible) {
-            setThemeCommandVisible(true);
-            toast({
-              title: "Theme Controls Unlocked 🌓",
-              description: "Check /help to see the theme command!",
-              variant: "default"
-            });
-          }
-        }}
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
         className="fixed top-4 right-4 z-50 p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30 hover:bg-purple-200 dark:hover:bg-purple-800/50 transition-colors border border-purple-300 dark:border-purple-600"
-        aria-label="Unlock theme commands"
+        aria-label="Toggle theme"
       >
         <SunIcon className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-purple-700" />
         <MoonIcon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-purple-300 top-2 left-2" />
@@ -537,18 +533,6 @@ const Level2 = ({ onComplete }) => {
                 Available Commands:
               </h2>
               <div className="space-y-1 mb-6">
-                {themeCommandVisible && (
-                  <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg border-l-4 border-[#F5A623]">
-                    <span className="font-bold text-purple-700 dark:text-purple-300">
-                      /theme
-                    </span>{" "}
-                    <span className="text-blue-600 dark:text-blue-300">[dark/light]</span>
-                    <p className="mt-1 text-gray-600 dark:text-gray-300">
-                      Switch between day and night. Watch the garden closely.
-                    </p>
-                  </div>
-                )}
-
                 <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg border-l-4 border-[#F5A623]">
                   <span className="font-bold text-purple-700 dark:text-purple-300">
                     /enter
