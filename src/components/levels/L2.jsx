@@ -376,7 +376,11 @@ const Level2 = ({ onComplete }) => {
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, delay: 0.3 }}
-        className="bg-gradient-to-b from-[#87CEEB] via-[#B0E0FF] to-[#4CAF50] dark:from-[#1a2744] dark:via-[#1e3a5f] dark:to-[#2e4a2e] rounded-2xl p-0 shadow-lg border border-purple-200 dark:border-purple-700/30 w-full max-w-md relative overflow-hidden"
+        className={`rounded-2xl p-0 shadow-lg border w-full max-w-md relative overflow-hidden transition-colors duration-1000 ${
+          isDarkScene 
+            ? "bg-gradient-to-b from-[#1a2744] via-[#1e3a5f] to-[#2e4a2e] border-purple-700/30" 
+            : "bg-gradient-to-b from-[#87CEEB] via-[#B0E0FF] to-[#4CAF50] border-purple-200"
+        }`}
         style={{ minHeight: "260px" }}
       >
         <svg viewBox="0 0 400 200" className="w-full h-full">
@@ -414,27 +418,31 @@ const Level2 = ({ onComplete }) => {
           </motion.g>
 
           {/* Clouds */}
-          <g opacity="0.7">
-            <ellipse cx="280" cy="35" rx="30" ry="12" fill="white" />
-            <ellipse cx="260" cy="30" rx="20" ry="10" fill="white" />
-            <ellipse cx="300" cy="32" rx="18" ry="9" fill="white" />
-          </g>
-          <g opacity="0.5">
-            <ellipse cx="150" cy="25" rx="22" ry="9" fill="white" />
-            <ellipse cx="135" cy="22" rx="15" ry="8" fill="white" />
-            <ellipse cx="168" cy="23" rx="14" ry="7" fill="white" />
-          </g>
+          {!isDarkScene && (
+            <>
+              <g opacity="0.7">
+                <ellipse cx="280" cy="35" rx="30" ry="12" fill="white" />
+                <ellipse cx="260" cy="30" rx="20" ry="10" fill="white" />
+                <ellipse cx="300" cy="32" rx="18" ry="9" fill="white" />
+              </g>
+              <g opacity="0.5">
+                <ellipse cx="150" cy="25" rx="22" ry="9" fill="white" />
+                <ellipse cx="135" cy="22" rx="15" ry="8" fill="white" />
+                <ellipse cx="168" cy="23" rx="14" ry="7" fill="white" />
+              </g>
+            </>
+          )}
 
           {/* Ground */}
-          <rect x="0" y="155" width="400" height="45" fill="#4CAF50" />
-          <rect x="0" y="155" width="400" height="5" fill="#66BB6A" opacity="0.6" />
+          <rect x="0" y="155" width="400" height="45" fill={isDarkScene ? "#2e4a2e" : "#4CAF50"} />
+          <rect x="0" y="155" width="400" height="5" fill={isDarkScene ? "#3a5a3a" : "#66BB6A"} opacity="0.6" />
 
           {/* Grass tufts */}
           {[20, 70, 130, 220, 300, 360].map((gx, i) => (
             <g key={i}>
-              <line x1={gx} y1={158} x2={gx - 3} y2={150} stroke="#388E3C" strokeWidth="1.5" />
-              <line x1={gx} y1={158} x2={gx} y2={148} stroke="#43A047" strokeWidth="1.5" />
-              <line x1={gx} y1={158} x2={gx + 3} y2={150} stroke="#388E3C" strokeWidth="1.5" />
+              <line x1={gx} y1={158} x2={gx - 3} y2={150} stroke={isDarkScene ? "#1a3a1a" : "#388E3C"} strokeWidth="1.5" />
+              <line x1={gx} y1={158} x2={gx} y2={148} stroke={isDarkScene ? "#2a4a2a" : "#43A047"} strokeWidth="1.5" />
+              <line x1={gx} y1={158} x2={gx + 3} y2={150} stroke={isDarkScene ? "#1a3a1a" : "#388E3C"} strokeWidth="1.5" />
             </g>
           ))}
 
