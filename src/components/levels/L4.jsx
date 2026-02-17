@@ -9,9 +9,15 @@ import { useCommandHistory } from "@/hooks/useCommandHistory";
 import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
 import { useTheme } from "next-themes";
 
-// 5x5 board
-const BOARD_SIZE = 5;
-const LETTERS = ["A", "B", "C", "D", "E"];
+// 4x4 board with missing bottom corners
+const BOARD_WIDTH = 4;
+const BOARD_HEIGHT = 4;
+const LETTERS = ["A", "B", "C", "D"];
+const MISSING_SQUARES = new Set([
+  `0,${BOARD_HEIGHT - 1}`,
+  `${BOARD_WIDTH - 1},${BOARD_HEIGHT - 1}`,
+]);
+const DEFAULT_START = null;
 
 // Knight L-shaped moves
 const KNIGHT_DELTAS = [
@@ -25,28 +31,36 @@ const KNIGHT_DELTAS = [
   { dx: -1, dy: -2 },
 ];
 
-const inBounds = (x, y) => x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE;
+const isPlayableSquare = (x, y) =>
+  x >= 0 &&
+  x < BOARD_WIDTH &&
+  y >= 0 &&
+  y < BOARD_HEIGHT &&
+  !MISSING_SQUARES.has(`${x},${y}`);
 
 const isValidKnightMove = (from, to) =>
   KNIGHT_DELTAS.some((d) => from.x + d.dx === to.x && from.y + d.dy === to.y);
 
-// Parse chess notation e.g. "A1" -> { x:0, y:4 }
+// Parse chess notation e.g. "A1" -> { x:0, y:3 }
 const parseNotation = (str) => {
   const s = str.trim().toUpperCase();
   if (s.length < 2) return null;
   const col = LETTERS.indexOf(s[0]);
   const row = parseInt(s.slice(1));
-  if (col < 0 || isNaN(row) || row < 1 || row > BOARD_SIZE) return null;
-  return { x: col, y: BOARD_SIZE - row };
+  if (col < 0 || isNaN(row) || row < 1 || row > BOARD_HEIGHT) return null;
+  return { x: col, y: BOARD_HEIGHT - row };
 };
 
-const toNotation = (x, y) => `${LETTERS[x]}${BOARD_SIZE - y}`;
+const toNotation = (x, y) => `${LETTERS[x]}${BOARD_HEIGHT - y}`;
+
+const PLAYABLE_SQUARES = Array.from({ length: BOARD_WIDTH * BOARD_HEIGHT }, (_, i) => {
+  const x = i % BOARD_WIDTH;
+  const y = Math.floor(i / BOARD_WIDTH);
+  return { x, y };
+}).filter((p) => isPlayableSquare(p.x, p.y));
 
 // Generate a random starting position
-const randomStart = () => ({
-  x: Math.floor(Math.random() * BOARD_SIZE),
-  y: Math.floor(Math.random() * BOARD_SIZE),
-});
+const isSameSquare = (a, b) => a.x === b.x && a.y === b.y;
 
 const Level4 = ({ onComplete }) => {
   const [inputValue, setInputValue] = useState("");
@@ -55,64 +69,76 @@ const Level4 = ({ onComplete }) => {
   const [isSuccess, setIsSuccess] = useState(false);
 
   const initialized = useRef(false);
-  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
-  const [knightPos, setKnightPos] = useState({ x: 0, y: 0 });
-  const [visited, setVisited] = useState(new Set(["0,0"]));
-  const [moveHistory, setMoveHistory] = useState([{ x: 0, y: 0 }]);
+  const [startPos, setStartPos] = useState(DEFAULT_START);
+  const [knightPos, setKnightPos] = useState(DEFAULT_START);
+  const [visited, setVisited] = useState(new Set());
+  const [moveHistory, setMoveHistory] = useState([]);
   const [moveCount, setMoveCount] = useState(0);
   const [isStuck, setIsStuck] = useState(false);
   const [message, setMessage] = useState("");
   const { toast } = useToast();
   const { theme, setTheme } = useTheme();
 
-  const totalSquares = BOARD_SIZE * BOARD_SIZE;
+  const totalSquares = PLAYABLE_SQUARES.length;
 
   // Initialize with random start on first mount
   useEffect(() => {
     if (!initialized.current) {
       initialized.current = true;
-      const s = randomStart();
-      setStartPos(s);
-      setKnightPos({ ...s });
-      setVisited(new Set([`${s.x},${s.y}`]));
-      setMoveHistory([{ ...s }]);
+      setStartPos(DEFAULT_START);
+      setKnightPos(DEFAULT_START);
+      setVisited(new Set());
+      setMoveHistory([]);
       setMessage(
-        `The knight begins at the green castle (${toNotation(s.x, s.y)}). Visit every square!`
+        "The bridge is empty. Choose where the knight begins with /start (e.g., /start A4)."
       );
     }
   }, []);
 
   const visitedCount = visited.size;
 
-  // Check win: all 25 squares visited (open tour — closed tour is impossible on 5×5)
+  const hasStart = !!startPos;
+  const isBackAtStart = hasStart && isSameSquare(knightPos, startPos);
+
+  // Check win: all playable squares visited and return to start (closed tour)
   useEffect(() => {
-    if (visitedCount === totalSquares && !isSuccess) {
+    if (hasStart && visitedCount === totalSquares && isBackAtStart && !isSuccess) {
       setIsSuccess(true);
       setMessage(
         String.fromCodePoint(0x1f389) +
-        " All squares visited! The knight conquered the board!"
+        " Closed tour complete! The knight returned to the start."
       );
     }
-  }, [visitedCount, totalSquares, isSuccess]);
+  }, [visitedCount, totalSquares, isBackAtStart, isSuccess, hasStart]);
+
+  useEffect(() => {
+    if (hasStart && visitedCount === totalSquares && !isBackAtStart && !isSuccess) {
+      setMessage(
+        `All squares visited! Return to ${toNotation(startPos.x, startPos.y)} to finish.`
+      );
+    }
+  }, [visitedCount, totalSquares, isBackAtStart, isSuccess, startPos, hasStart]);
 
   useEffect(() => {
     if (isSuccess) {
       toast({
         title: "Knight's Tour Complete! " + String.fromCodePoint(0x265e),
-        description: `Open tour finished in ${moveCount} moves!`,
+        description: `Closed tour finished in ${moveCount} moves!`,
         variant: "success",
       });
       setTimeout(() => onComplete(4), 2000);
     }
   }, [isSuccess, onComplete, toast, moveCount]);
 
-  // Check stuck (no valid unvisited moves remaining)
+  // Check stuck (no valid moves remaining)
   useEffect(() => {
-    if (visitedCount < totalSquares && !isSuccess && moveCount > 0) {
+    if (!hasStart || isSuccess || moveCount === 0) return;
+
+    if (visitedCount < totalSquares) {
       const hasMove = KNIGHT_DELTAS.some((d) => {
         const nx = knightPos.x + d.dx;
         const ny = knightPos.y + d.dy;
-        return inBounds(nx, ny) && !visited.has(`${nx},${ny}`);
+        return isPlayableSquare(nx, ny) && !visited.has(`${nx},${ny}`);
       });
       if (!hasMove) {
         setIsStuck(true);
@@ -122,16 +148,50 @@ const Level4 = ({ onComplete }) => {
       } else {
         setIsStuck(false);
       }
+      return;
     }
-  }, [knightPos, visited, visitedCount, totalSquares, isSuccess, moveCount]);
 
-  // Valid moves for current position (unvisited only)
+    if (!isBackAtStart) {
+      const canReturn = KNIGHT_DELTAS.some((d) => {
+        const nx = knightPos.x + d.dx;
+        const ny = knightPos.y + d.dy;
+        return nx === startPos.x && ny === startPos.y;
+      });
+      if (!canReturn) {
+        setIsStuck(true);
+        setMessage(
+          `All squares visited, but no path back to ${toNotation(startPos.x, startPos.y)}. Use /undo or /reset.`
+        );
+      } else {
+        setIsStuck(false);
+      }
+    }
+  }, [
+    knightPos,
+    visited,
+    visitedCount,
+    totalSquares,
+    isSuccess,
+    moveCount,
+    isBackAtStart,
+    startPos,
+  ]);
+
+  // Valid moves for current position
   const getValidMoves = useCallback(() => {
+    if (!hasStart) return [];
     return KNIGHT_DELTAS.map((d) => ({
       x: knightPos.x + d.dx,
       y: knightPos.y + d.dy,
-    })).filter((m) => inBounds(m.x, m.y) && !visited.has(`${m.x},${m.y}`));
-  }, [knightPos, visited]);
+    }))
+      .filter((m) => isPlayableSquare(m.x, m.y))
+      .filter((m) => {
+        const key = `${m.x},${m.y}`;
+        if (!visited.has(key)) return true;
+        const isStartSquare = m.x === startPos.x && m.y === startPos.y;
+        return isStartSquare && visited.size === totalSquares && !isBackAtStart;
+      });
+  }, [knightPos, visited, startPos, totalSquares, isBackAtStart, hasStart]);
 
   const validMoves = getValidMoves();
 
@@ -139,7 +199,8 @@ const Level4 = ({ onComplete }) => {
     pushCommand(inputValue);
     const cmd = inputValue.trim().toLowerCase();
     const themeMatch = cmd.match(/^\/theme\s+(dark|light)$/i);
-    const moveMatch = cmd.match(/^\/move\s+([a-e]\d)$/i);
+    const startMatch = cmd.match(/^\/start\s+([a-d][1-4])$/i);
+    const moveMatch = cmd.match(/^\/move\s+([a-d][1-4])$/i);
     const undoMatch = cmd.match(/^\/undo$/i);
     const resetMatch = cmd.match(/^\/reset$/i);
     const helpMatch = cmd.match(/^\/help$/i);
@@ -151,18 +212,58 @@ const Level4 = ({ onComplete }) => {
         description: `Switched to ${themeMatch[1].toLowerCase()} mode`,
         variant: "default"
       });
+    } else if (startMatch) {
+      const target = parseNotation(startMatch[1]);
+      if (!target) {
+        toast({
+          title: "Invalid Square",
+          description: "Use A1-D4 (note: A1 and D1 are missing).",
+          variant: "destructive",
+        });
+      } else if (!isPlayableSquare(target.x, target.y)) {
+        toast({
+          title: "Missing Square",
+          description: `${startMatch[1].toUpperCase()} is not part of the board.`,
+          variant: "destructive",
+        });
+      } else {
+        setStartPos(target);
+        setKnightPos(target);
+        setVisited(new Set([`${target.x},${target.y}`]));
+        setMoveHistory([{ ...target }]);
+        setMoveCount(0);
+        setIsSuccess(false);
+        setIsStuck(false);
+        setMessage(
+          `Start set to ${toNotation(target.x, target.y)}. Cross the bridge by stepping on each stone once, then return to the start.`
+        );
+        toast({
+          title: "Start Set",
+          description: `Knight placed at ${toNotation(target.x, target.y)}.`,
+          variant: "default",
+        });
+      }
     } else if (moveMatch) {
+      if (!hasStart) {
+        toast({
+          title: "Place the Knight",
+          description: "Choose a starting square with /start first.",
+          variant: "destructive",
+        });
+        setInputValue("");
+        return;
+      }
       const target = parseNotation(moveMatch[1]);
       if (!target) {
         toast({
           title: "Invalid Square",
-          description: `Use A1\u2013E5.`,
+          description: "Use A1-D4 (note: A1 and D1 are missing).",
           variant: "destructive",
         });
-      } else if (!inBounds(target.x, target.y)) {
+      } else if (!isPlayableSquare(target.x, target.y)) {
         toast({
-          title: "Out of Bounds",
-          description: `${moveMatch[1].toUpperCase()} is outside the 5\u00d75 board.`,
+          title: "Missing Square",
+          description: `${moveMatch[1].toUpperCase()} is not part of the board.`,
           variant: "destructive",
         });
       } else if (!isValidKnightMove(knightPos, target)) {
@@ -171,7 +272,10 @@ const Level4 = ({ onComplete }) => {
           description: `The knight can\u2019t reach ${toNotation(target.x, target.y)} from ${toNotation(knightPos.x, knightPos.y)}. Move in an L-shape!`,
           variant: "destructive",
         });
-      } else if (visited.has(`${target.x},${target.y}`)) {
+      } else if (
+        visited.has(`${target.x},${target.y}`) &&
+        !(isSameSquare(target, startPos) && visitedCount === totalSquares)
+      ) {
         toast({
           title: "Square Already Visited",
           description: `${toNotation(target.x, target.y)} has already vanished!`,
@@ -179,7 +283,10 @@ const Level4 = ({ onComplete }) => {
         });
       } else {
         const newVisited = new Set(visited);
-        newVisited.add(`${target.x},${target.y}`);
+        const isReturnToStart = isSameSquare(target, startPos);
+        if (!isReturnToStart) {
+          newVisited.add(`${target.x},${target.y}`);
+        }
         const newCount = moveCount + 1;
         setKnightPos(target);
         setVisited(newVisited);
@@ -190,6 +297,10 @@ const Level4 = ({ onComplete }) => {
         if (remaining > 0) {
           setMessage(
             `Moved to ${toNotation(target.x, target.y)}. ${remaining} square${remaining !== 1 ? "s" : ""} remaining.`
+          );
+        } else if (!isReturnToStart) {
+          setMessage(
+            `All squares visited! Return to ${toNotation(startPos.x, startPos.y)} to finish.`
           );
         }
       }
@@ -217,20 +328,28 @@ const Level4 = ({ onComplete }) => {
         });
       }
     } else if (resetMatch) {
-      const s = randomStart();
-      setStartPos(s);
-      setKnightPos({ ...s });
-      setMoveHistory([{ ...s }]);
-      setVisited(new Set([`${s.x},${s.y}`]));
+      if (!hasStart) {
+        setMessage("Choose a starting square with /start to begin the crossing.");
+        toast({
+          title: "No Start Set",
+          description: "Use /start to place the knight.",
+          variant: "destructive",
+        });
+        setInputValue("");
+        return;
+      }
+      setKnightPos({ ...startPos });
+      setMoveHistory([{ ...startPos }]);
+      setVisited(new Set([`${startPos.x},${startPos.y}`]));
       setMoveCount(0);
       setIsSuccess(false);
       setIsStuck(false);
       setMessage(
-        `New start at ${toNotation(s.x, s.y)}. Visit every square!`
+        `Restarted at ${toNotation(startPos.x, startPos.y)}. Cross the bridge by stepping on each stone once, then return to the start.`
       );
       toast({
         title: "Level Reset",
-        description: `Knight placed at ${toNotation(s.x, s.y)}. Try again!`,
+        description: `Knight placed at ${toNotation(startPos.x, startPos.y)}. Try again!`,
         variant: "default",
       });
     } else if (helpMatch) {
@@ -251,8 +370,8 @@ const Level4 = ({ onComplete }) => {
 
   const CELL = 64;
   const LABEL = 22;
-  const SVG_W = BOARD_SIZE * CELL + LABEL;
-  const SVG_H = BOARD_SIZE * CELL + LABEL;
+  const SVG_W = BOARD_WIDTH * CELL + LABEL;
+  const SVG_H = BOARD_HEIGHT * CELL + LABEL;
 
   return (
     <div className="flex flex-col items-center mt-8 max-w-4xl mx-auto px-4">
@@ -281,7 +400,7 @@ const Level4 = ({ onComplete }) => {
           ))}
 
           {/* Row labels */}
-          {Array.from({ length: BOARD_SIZE }, (_, i) => (
+          {Array.from({ length: BOARD_HEIGHT }, (_, i) => (
             <text
               key={`row-${i}`}
               x={9}
@@ -291,16 +410,19 @@ const Level4 = ({ onComplete }) => {
               fill="#8888BB"
               fontWeight="bold"
             >
-              {BOARD_SIZE - i}
+              {BOARD_HEIGHT - i}
             </text>
           ))}
 
           {/* Grid cells */}
-          {Array.from({ length: BOARD_SIZE }, (_, row) =>
-            Array.from({ length: BOARD_SIZE }, (_, col) => {
+          {Array.from({ length: BOARD_HEIGHT }, (_, row) =>
+            Array.from({ length: BOARD_WIDTH }, (_, col) => {
+              if (!isPlayableSquare(col, row)) return null;
               const key = `${col},${row}`;
-              const isKnight = col === knightPos.x && row === knightPos.y;
-              const isStart = col === startPos.x && row === startPos.y;
+              const isKnight =
+                hasStart && col === knightPos.x && row === knightPos.y;
+              const isStart =
+                hasStart && col === startPos.x && row === startPos.y;
               const isVisited = visited.has(key) && !isKnight && !isStart;
               const isValid = validMoves.some(
                 (m) => m.x === col && m.y === row
@@ -437,21 +559,23 @@ const Level4 = ({ onComplete }) => {
           )}
 
           {/* Knight piece */}
-          <AnimatePresence mode="popLayout">
-            <motion.text
-              key={`knight-${knightPos.x}-${knightPos.y}`}
-              x={LABEL + knightPos.x * CELL + CELL / 2}
-              y={knightPos.y * CELL + CELL / 2 + 12}
-              textAnchor="middle"
-              fontSize="36"
-              className="select-none"
-              initial={{ scale: 0.3, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            >
-              {String.fromCodePoint(0x265e)}
-            </motion.text>
-          </AnimatePresence>
+          {hasStart && (
+            <AnimatePresence mode="popLayout">
+              <motion.text
+                key={`knight-${knightPos.x}-${knightPos.y}`}
+                x={LABEL + knightPos.x * CELL + CELL / 2}
+                y={knightPos.y * CELL + CELL / 2 + 12}
+                textAnchor="middle"
+                fontSize="36"
+                className="select-none"
+                initial={{ scale: 0.3, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              >
+                {String.fromCodePoint(0x265e)}
+              </motion.text>
+            </AnimatePresence>
+          )}
         </svg>
 
 
@@ -529,6 +653,19 @@ const Level4 = ({ onComplete }) => {
 
                 <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg border-l-4 border-[#F5A623]">
                   <span className="font-bold text-purple-700 dark:text-purple-300">
+                    /start
+                  </span>{" "}
+                  <span className="text-blue-600 dark:text-blue-300">
+                    [square]
+                  </span>
+                  <p className="mt-1 text-gray-600 dark:text-gray-300">
+                    Choose the starting square (e.g.,{" "}
+                    <code>/start A4</code>).
+                  </p>
+                </div>
+
+                <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg border-l-4 border-[#F5A623]">
+                  <span className="font-bold text-purple-700 dark:text-purple-300">
                     /move
                   </span>{" "}
                   <span className="text-blue-600 dark:text-blue-300">
@@ -538,7 +675,7 @@ const Level4 = ({ onComplete }) => {
                     Move the knight to a square (e.g.,{" "}
                     <code>/move B3</code>).
                     <br />
-                    Columns: A{"\u2013"}E, Rows: 1{"\u2013"}5
+                    Columns: A-D, Rows: 1-4 (A1 and D1 are missing)
                   </p>
                 </div>
                 <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg border-l-4 border-[#F5A623]">
@@ -571,7 +708,8 @@ const Level4 = ({ onComplete }) => {
                 Hint:
               </h3>
               <p className="text-gray-600 dark:text-gray-300 italic">
-                The path narrows as the squares crumble. Corners hold the key before the center devours all.
+                Lore: The bridge only holds if every stone is touched once. Choose a start, cross every stone, and return to where you began.
+                Hint: Start at A4. A good opening is A4 {" -> "} C3 {" -> "} A2 {" -> "} C1. If you later reach B1, you're close to closing the loop.
               </p>
             </div>
 
